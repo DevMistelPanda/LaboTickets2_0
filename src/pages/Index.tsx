@@ -1,6 +1,7 @@
 
 import { useEffect } from 'react';
 import Header from '@/components/Header';
+import CountdownTimer from '@/components/CountdownTimer';
 import Hero from '@/components/Hero';
 import AboutSection from '@/components/AboutSection';
 import DetailsSection from '@/components/DetailsSection';
@@ -21,6 +22,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Header />
+      <CountdownTimer />
       <Hero />
       <AboutSection />
       <DetailsSection />
