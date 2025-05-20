@@ -37,6 +37,12 @@ const CountdownTimer = () => {
       // Update state
       setTimeLeft({ days, hours, minutes, seconds });
       
+      // Update DOM elements directly for the embedded version
+      document.getElementById('days')?.textContent = days.toString();
+      document.getElementById('hours')?.textContent = hours.toString();
+      document.getElementById('minutes')?.textContent = minutes.toString();
+      document.getElementById('seconds')?.textContent = seconds.toString();
+      
       // If the countdown is finished, clear the interval
       if (distance < 0) {
         clearInterval(timer);

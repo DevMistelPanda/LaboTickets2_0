@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock } from 'lucide-react';
+import CountdownTimer from '@/components/CountdownTimer';
 
 const Hero = () => {
   return (
@@ -21,6 +22,29 @@ const Hero = () => {
             <span className="block text-party-purple text-shadow">School Party 2025</span>
           </h1>
           
+          {/* Countdown Timer placed here, below the slogan */}
+          <div className="mb-8 bg-black/30 backdrop-blur-sm rounded-lg p-4">
+            <p className="text-sm font-medium mb-2">Countdown to the Party:</p>
+            <div className="flex justify-center items-center space-x-4 sm:space-x-8">
+              <div className="flex flex-col items-center">
+                <span className="text-xl sm:text-2xl font-bold" id="days">0</span>
+                <span className="text-xs uppercase tracking-wide opacity-80">Days</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-xl sm:text-2xl font-bold" id="hours">0</span>
+                <span className="text-xs uppercase tracking-wide opacity-80">Hours</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-xl sm:text-2xl font-bold" id="minutes">0</span>
+                <span className="text-xs uppercase tracking-wide opacity-80">Minutes</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-xl sm:text-2xl font-bold" id="seconds">0</span>
+                <span className="text-xs uppercase tracking-wide opacity-80">Seconds</span>
+              </div>
+            </div>
+          </div>
+          
           <p className="text-xl md:text-2xl mb-8 opacity-90">
             Join us for an unforgettable night of music, dance, and memories that will last a lifetime.
           </p>
@@ -37,11 +61,15 @@ const Hero = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <Button size="lg" className="bg-party-purple hover:bg-party-blue text-white rounded-full px-8 py-6 text-lg font-semibold">
-              <a href="#rsvp">RSVP Now</a>
+            <Button size="lg" className="bg-party-purple hover:bg-party-blue text-white rounded-full px-8 py-6 text-lg font-semibold transition-colors duration-300">
+              <a href="#rsvp" className="w-full h-full flex items-center justify-center">RSVP Now</a>
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 rounded-full px-8 py-6 text-lg font-semibold">
-              <a href="#details">Event Details</a>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-2 border-white text-white hover:bg-white/20 rounded-full px-8 py-6 text-lg font-semibold transition-colors duration-300"
+            >
+              <a href="#details" className="w-full h-full flex items-center justify-center">Event Details</a>
             </Button>
           </div>
         </div>
