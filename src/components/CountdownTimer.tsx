@@ -38,10 +38,15 @@ const CountdownTimer = () => {
       setTimeLeft({ days, hours, minutes, seconds });
       
       // Update DOM elements directly for the embedded version
-      document.getElementById('days')?.textContent = days.toString();
-      document.getElementById('hours')?.textContent = hours.toString();
-      document.getElementById('minutes')?.textContent = minutes.toString();
-      document.getElementById('seconds')?.textContent = seconds.toString();
+      const daysElement = document.getElementById('days');
+      const hoursElement = document.getElementById('hours');
+      const minutesElement = document.getElementById('minutes');
+      const secondsElement = document.getElementById('seconds');
+      
+      if (daysElement) daysElement.textContent = days.toString();
+      if (hoursElement) hoursElement.textContent = hours.toString();
+      if (minutesElement) minutesElement.textContent = minutes.toString();
+      if (secondsElement) secondsElement.textContent = seconds.toString();
       
       // If the countdown is finished, clear the interval
       if (distance < 0) {
