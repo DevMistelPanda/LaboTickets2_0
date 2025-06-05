@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock } from 'lucide-react';
 import CountdownTimer from '@/components/CountdownTimer';
@@ -22,37 +21,20 @@ const Hero = () => {
             <span className="block text-party-purple text-shadow">Ein weiteres Jahr Labenwolf</span>
           </h1>
           
-          {/* Countdown Timer placed here, below the slogan */}
+          {/* Countdown Timer using the component */}
           <div className="mb-8 bg-black/30 backdrop-blur-sm rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">Countdown to the Party:</p>
-            <div className="flex justify-center items-center space-x-4 sm:space-x-8">
-              <div className="flex flex-col items-center">
-                <span className="text-xl sm:text-2xl font-bold" id="days">0</span>
-                <span className="text-xs uppercase tracking-wide opacity-80">Days</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-xl sm:text-2xl font-bold" id="hours">0</span>
-                <span className="text-xs uppercase tracking-wide opacity-80">Hours</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-xl sm:text-2xl font-bold" id="minutes">0</span>
-                <span className="text-xs uppercase tracking-wide opacity-80">Minutes</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-xl sm:text-2xl font-bold" id="seconds">0</span>
-                <span className="text-xs uppercase tracking-wide opacity-80">Seconds</span>
-              </div>
-            </div>
+            <p className="text-sm font-medium mb-2">Zeit bis zum Ball:</p>
+            <CountdownTimer targetDate="2025-06-05T13:23:00" />
           </div>
-          
+
           <p className="text-xl md:text-2xl mb-8 opacity-90">
-            Seit mit dabei ein weiteres Jahr Labenwolf Gymnsaium zu feiern!
+            Seid mit dabei, ein weiteres Jahr Labenwolf Gymnasium zu feiern!
           </p>
           
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
             <div className="flex items-center">
               <Calendar className="mr-2 text-party-purple" size={24} />
-              <span className="text-lg">15 Juli 2025</span>
+              <span className="text-lg">15. Juli 2025</span>
             </div>
             <div className="flex items-center">
               <Clock className="mr-2 text-party-purple" size={24} />
