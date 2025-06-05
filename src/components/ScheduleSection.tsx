@@ -44,7 +44,7 @@ const ScheduleSection = () => {
       name: "DJ",
       role: "DJ",
       image: "TBA",
-      description: "Our school's talented rock band playing their original songs and covers."
+      description: "Unser AK Licht & Ton wrid den Abend mit einem DJ begleiten, der für die richtige Stimmung sorgt."
     },
     {
       name: "Schulball Playlist 2024",

@@ -10,7 +10,7 @@ const AboutSection = () => {
     },
     {
       icon: <Music size={40} className="text-party-purple mb-4" />,
-      title: "Das erste mal mit DJ und Live-Bands",
+      title: "Das erste mal mit DJ und Live-Band",
       description: "Genieße die besten Beats von unserem DJ und unserer Live-Band, die für die perfekte Stimmung sorgen werden."
     },
     {
