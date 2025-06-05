@@ -14,12 +14,12 @@ const ScheduleSection = () => {
     {
       time: "16:30 Uhr",
       title: "Begrüßung der ersten Gäste",
-      description: "Kurze Ansprache durch die Organisatoren und Vorstellung des Programms."
+      description: "Kurze Ansprache durch die Organisatoren und kurze Vorstellung des Programms."
     },
     {
-      time: "bis 20:00 Uhr",
+      time: "20:00 Uhr",
       title: "Ende für 5. -8. KLassen",
-      description: "Aus Rechtlichen Gründen müssen die jüngeren Schüler um 20:00 Uhr den Ball verlassen."
+      description: "Aus rechtlichen Gründen müssen die jüngeren Schüler um 20:00 Uhr den Ball verlassen."
     },
     {
       time: "22:00 Uhr",
@@ -27,7 +27,7 @@ const ScheduleSection = () => {
       description: "Der Ball endet offiziell."
     },
     {
-      time: "nach 22 Uhr",
+      time: "ab 22:00 Uhr",
       title: "Gemeinsames Aufräumen",
       description: "Alle Helfer und Organisatoren packen mit an, um den Veranstaltungsort sauber zu hinterlassen. Wir freuen uns über jede helfende Hand!"
     }
@@ -63,7 +63,7 @@ const ScheduleSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Party Programm</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            Wir haben den Ball wie immer im Detail geplant, um euch ein tolles erlebnis zu bieten. Hier ist unser Programm für den Abend:
+            Wir haben den Ball wie immer im Detail geplant, um euch ein tolles Erlebnis zu bieten. Hier ist unser Programm für den Abend:
           </p>
         </div>
 
