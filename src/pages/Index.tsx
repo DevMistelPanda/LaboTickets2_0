@@ -8,6 +8,7 @@ import ScheduleSection from '@/components/ScheduleSection';
 import FaqSection from '@/components/FaqSection';
 import Footer from '@/components/Footer';
 
+
 const Index = () => {
   useEffect(() => {
     // Update document title
