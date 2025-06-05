@@ -64,7 +64,7 @@ const DetailsSection = () => {
             </div>
           </div>
 
-          <div className="rounded-xl overflow-hidden shadow-md h-[350px]">
+          <div className="rounded-xl overflow-hidden shadow-md h-[450px]">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5186.574405136288!2d11.082098812366588!3d49.460187758048825!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x479f57bbc4f14e41%3A0xf3b84176aa35f091!2sLabenwolf-Gymnasium%20N%C3%BCrnberg!5e0!3m2!1sde!2sde!4v1749117811019!5m2!1sde!2sde" 
               width="100%" 
