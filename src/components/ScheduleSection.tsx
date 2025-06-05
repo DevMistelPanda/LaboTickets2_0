@@ -63,7 +63,7 @@ const ScheduleSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Party Programm</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            A carefully planned evening to ensure everyone has a fantastic time. Here's what to expect.
+            Wir haben den Ball wie immer im Detail geplant, um euch ein tolles erlebnis zu bieten. Hier ist unser Programm für den Abend:
           </p>
         </div>
 
