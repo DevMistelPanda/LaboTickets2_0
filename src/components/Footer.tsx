@@ -9,10 +9,10 @@ const Footer = () => {
     {
       title: "Quick Links",
       links: [
-        { name: "About", href: "#about" },
-        { name: "Details", href: "#details" },
-        { name: "Schedule", href: "#schedule" },
-        { name: "FAQ", href: "#faq" },
+        { name: "About", href: "/#about" },
+        { name: "Details", href: "/#details" },
+        { name: "Schedule", href: "/#schedule" },
+        { name: "FAQ", href: "/#faq" },
       ]
     },
     {

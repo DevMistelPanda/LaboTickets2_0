@@ -16,10 +16,10 @@ const Header = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Infos', href: '#about' },
-    { name: 'Details', href: '#details' },
-    { name: 'Programm', href: '#schedule' },
-    { name: 'FAQ', href: '#faq' },
+    { name: 'Infos', href: '/#about' },
+    { name: 'Details', href: '/#details' },
+    { name: 'Programm', href: '/#schedule' },
+    { name: 'FAQ', href: '/#faq' },
   ];
 
   return (
