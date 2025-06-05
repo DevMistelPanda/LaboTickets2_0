@@ -7,55 +7,52 @@ const ScheduleSection = () => {
   
   const scheduleItems = [
     {
-      time: "7:00 PM - 7:30 PM",
-      title: "Doors Open & Welcome Reception",
-      description: "Arrive, get your welcome pack, and enjoy welcome drinks."
+      time: "16:00 Uhr",
+      title: "Es geht los!",
+      description: "Einlass beginnt, die ersten Gäste treffen ein. Unser Team begrüßt euch herzlich."
     },
     {
-      time: "7:30 PM - 8:00 PM",
-      title: "Opening Ceremony",
-      description: "Welcome speech by the principal and student council president."
+      time: "16:30 Uhr",
+      title: "Begrüßung der ersten Gäste",
+      description: "Kurze Ansprache durch die Organisatoren und Vorstellung des Programms."
     },
     {
-      time: "8:00 PM - 9:30 PM",
-      title: "Dinner & Social Time",
-      description: "Enjoy a delicious buffet dinner while socializing with friends."
+      time: "bis 20:00 Uhr",
+      title: "Ende für 5. -8. KLassen",
+      description: "Aus Rechtlichen Gründen müssen die jüngeren Schüler um 20:00 Uhr den Ball verlassen."
     },
     {
-      time: "9:30 PM - 10:00 PM",
-      title: "Special Performances",
-      description: "Performances by the school band, dance team, and choir."
+      time: "22:00 Uhr",
+      title: "Ende Des Balls",
+      description: "Der Ball endet offiziell."
     },
     {
-      time: "10:00 PM - 11:30 PM",
-      title: "Main Party",
-      description: "DJ takes over with dance music and special party games."
-    },
-    {
-      time: "11:30 PM - 12:00 AM",
-      title: "Closing Surprise & Farewell",
-      description: "Special closing ceremony with a surprise announcement."
+      time: "nach 22 Uhr",
+      title: "Gemeinsames Aufräumen",
+      description: "Alle Helfer und Organisatoren packen mit an, um den Veranstaltungsort sauber zu hinterlassen. Wir freuen uns über jede helfende Hand!"
     }
   ];
   
   const performers = [
     {
-      name: "DJ Groove Master",
-      role: "Main DJ",
-      image: "https://images.unsplash.com/photo-1506252374453-ef5237291d83?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      description: "Professional DJ who will keep the dance floor packed all night long."
+      name: "Unsere Live Band",
+      role: "TBA",
+      image: "TBA",
+      description: "Unsere Live Band wird den Abend mit toller Musik begleiten. Details folgen bald!"
     },
     {
-      name: "The Wildcats",
-      role: "School Band",
-      image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      name: "DJ",
+      role: "DJ",
+      image: "TBA",
       description: "Our school's talented rock band playing their original songs and covers."
     },
     {
-      name: "Dance Fusion",
-      role: "Dance Crew",
-      image: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      description: "Award-winning dance crew that will showcase amazing choreography."
+      name: "Schulball Playlist 2024",
+      role: <a href="https://open.spotify.com/playlist/5gLhpUbpP8fuMhHPQCI4XI?si=583efdb5e17942b2"> Klicke hier</a>,
+      image: "https://developer.spotify.com/images/guidelines/design/using-our-logo.svg",
+      description: <a href="https://open.spotify.com/playlist/5gLhpUbpP8fuMhHPQCI4XI?si=583efdb5e17942b2" className="text-gray-400 hover:text-party-purple">
+      Bekommt mit der Schulball Playlist 2024 einen Vorgeschmack auf die Musik, die euch erwartet!
+      </a>
     }
   ];
 
@@ -76,13 +73,13 @@ const ScheduleSection = () => {
               className={`rounded-full px-6 ${activeTab === 'schedule' ? 'bg-party-purple text-white' : 'bg-transparent text-party-dark hover:bg-gray-100'}`}
               onClick={() => setActiveTab('schedule')}
             >
-              Timeline
+              Programm
             </Button>
             <Button
               className={`rounded-full px-6 ${activeTab === 'performers' ? 'bg-party-purple text-white' : 'bg-transparent text-party-dark hover:bg-gray-100'}`}
               onClick={() => setActiveTab('performers')}
             >
-              Performers
+              Unsere Musik
             </Button>
           </div>
         </div>
