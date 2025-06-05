@@ -28,7 +28,7 @@ const NotFound = () => {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
         <div className="max-w-3xl animate-fade-in text-center">
-          <div className="text-6xl md:text-7xl font-extrabold mb-4">🎭 404</div>
+          <div className="text-6xl md:text-7xl font-extrabold mb-4">404</div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
             Verirrt im Maskenball
