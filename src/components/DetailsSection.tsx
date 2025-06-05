@@ -1,5 +1,5 @@
 
-import { MapPin, Calendar, Clock, Users, Euro } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Euro, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const DetailsSection = () => {
@@ -28,6 +28,11 @@ const DetailsSection = () => {
       icon: <Euro size={28} className="text-party-purple" />,
       title: "Eintritt",
       info: "Der Eintritt wird noch bekannt gegeben"
+    },
+    {
+      icon: <Ticket size={28} className="text-party-purple" />,
+      title: "Tickets",
+      info: "Tickets könnt ihr nach den Pfingstferien in den Pausen erwerben, oder an der Abendkasse kaufen."
     }
   ];
 
