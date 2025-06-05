@@ -67,34 +67,6 @@ const DetailsSection = () => {
             ></iframe>
           </div>
         </div>
-
-        <div id="rsvp" className="bg-gradient-to-r from-party-purple to-party-blue p-8 md:p-12 rounded-xl text-white text-center">
-          <h3 className="text-2xl md:text-3xl font-bold mb-4">Secure Your Spot!</h3>
-          <p className="mb-8 max-w-2xl mx-auto">
-            Tickets are limited and going fast! Reserve your place now to avoid disappointment. Early bird tickets available until May 15th.
-          </p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
-            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl">
-              <h4 className="text-xl font-bold mb-2">Early Bird</h4>
-              <p className="text-3xl font-bold mb-2">$15</p>
-              <p className="text-sm mb-4">Until May 15th</p>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm p-6 rounded-xl transform scale-105 border-2 border-white">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-party-blue px-4 py-1 rounded-full text-sm font-bold">POPULAR</div>
-              <h4 className="text-xl font-bold mb-2">Standard</h4>
-              <p className="text-3xl font-bold mb-2">$20</p>
-              <p className="text-sm mb-4">May 16th - June 10th</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl">
-              <h4 className="text-xl font-bold mb-2">Last Minute</h4>
-              <p className="text-3xl font-bold mb-2">$25</p>
-              <p className="text-sm mb-4">After June 10th</p>
-            </div>
-          </div>
-          <Button size="lg" className="bg-white text-party-purple hover:bg-white/90 rounded-full px-8 py-6 text-lg font-semibold">
-            Reserve Your Ticket
-          </Button>
-        </div>
       </div>
     </section>
   );
