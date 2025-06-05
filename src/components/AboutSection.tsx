@@ -24,7 +24,7 @@ const AboutSection = () => {
     <section id="about" className="py-16 md:py-24 bg-party-light-purple">
       <div className="section-container">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">About the Party</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Infos zum Ball</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
             Auch dieses Jahr ist es wieder soweit: Der Schulball steht vor der Tür! Wir freuen uns darauf, mit euch eine unvergessliche Nacht voller Musik, Tanz und guter Laune zu verbringen.
