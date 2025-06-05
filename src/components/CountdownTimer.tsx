@@ -1,36 +1,45 @@
 import { useEffect, useState } from 'react';
 
 const CountdownTimer = ({ targetDate }: { targetDate: string }) => {
-  const calculateTimeLeft = () => {
-    const difference = +new Date(targetDate) - +new Date();
-    let timeLeft = {
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-    };
+  const [timeLeft, setTimeLeft] = useState(getTimeLeft());
+  const [hasEnded, setHasEnded] = useState(false);
 
-    if (difference > 0) {
-      timeLeft = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
+  function getTimeLeft() {
+    const difference = +new Date(targetDate) - +new Date();
+
+    if (difference <= 0) {
+      setHasEnded(true);
+      return {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
       };
     }
 
-    return timeLeft;
-  };
-
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+    return {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60),
+    };
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      setTimeLeft(getTimeLeft());
     }, 1000);
 
     return () => clearInterval(timer);
   }, [targetDate]);
+
+  if (hasEnded) {
+    return (
+      <div className="text-center text-2xl sm:text-3xl font-bold text-green-400">
+        🎉 Der Schulball 2025 ist gestartet 🎉
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center space-x-4 sm:space-x-8">
