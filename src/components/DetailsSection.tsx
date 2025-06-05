@@ -1,8 +1,10 @@
-
+import { useEffect, useRef } from 'react';
 import { MapPin, Calendar, Clock, Users, Euro, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const DetailsSection = () => {
+  const pinterestRef = useRef<HTMLDivElement>(null);
+
   const details = [
     {
       icon: <Calendar size={28} className="text-party-purple" />,
@@ -36,6 +38,24 @@ const DetailsSection = () => {
     }
   ];
 
+  useEffect(() => {
+    const scriptId = "pinterest-script";
+
+    // Load Pinterest script if not already present
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "https://assets.pinterest.com/js/pinit.js";
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    } else {
+      // If script already loaded, re-render widgets
+      // @ts-ignore
+      if (window.PinUtils) window.PinUtils.build();
+    }
+  }, []);
+
   return (
     <section id="details" className="py-16 md:py-24">
       <div className="section-container">
@@ -48,6 +68,7 @@ const DetailsSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
+          {/* Event Info */}
           <div className="bg-white p-8 rounded-xl shadow-md">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {details.map((item, index) => (
@@ -64,8 +85,20 @@ const DetailsSection = () => {
             </div>
           </div>
 
-          <div className="rounded-xl overflow-hidden shadow-md h-[450px]">
-            <a data-pin-do="embedBoard" href="https://www.pinterest.com/08t5h67rdqdlfcq/beautiful-nature/" data-pin-scale-width="120" data-pin-scale-height="400" data-pin-board-width="600" ></a><script async type="text/javascript" src="https://assets.pinterest.com/js/pinit.js"></script>
+          {/* Pinterest Embed */}
+          <div
+            ref={pinterestRef}
+            className="rounded-xl overflow-hidden shadow-md h-[450px] flex items-center justify-center"
+          >
+            <a
+              data-pin-do="embedBoard"
+              data-pin-board-width="600"
+              data-pin-scale-height="400"
+              data-pin-scale-width="90"
+              href="https://www.pinterest.com/08t5h67rdqdlfcq/beautiful-nature/"
+            >
+              Pinterest Board
+            </a>
           </div>
         </div>
       </div>
