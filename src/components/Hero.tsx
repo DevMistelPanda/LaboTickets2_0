@@ -46,31 +46,18 @@ const Hero = () => {
           </div>
           
           <p className="text-xl md:text-2xl mb-8 opacity-90">
-            Join us for an unforgettable night of music, dance, and memories that will last a lifetime.
+            Seit mit dabei ein weiteres Jahr Labenwolf Gymnsaium zu feiern!
           </p>
           
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
             <div className="flex items-center">
               <Calendar className="mr-2 text-party-purple" size={24} />
-              <span className="text-lg">June 15, 2025</span>
+              <span className="text-lg">15 Juli 2025</span>
             </div>
             <div className="flex items-center">
               <Clock className="mr-2 text-party-purple" size={24} />
-              <span className="text-lg">7:00 PM - 12:00 AM</span>
+              <span className="text-lg">16:00 Uhr - 22:00 Uhr</span>
             </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <Button size="lg" className="bg-party-purple hover:bg-party-blue text-white rounded-full px-8 py-6 text-lg font-semibold transition-colors duration-300">
-              <a href="#rsvp" className="w-full h-full flex items-center justify-center">RSVP Now</a>
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-2 border-white text-white hover:bg-white/20 rounded-full px-8 py-6 text-lg font-semibold transition-colors duration-300"
-            >
-              <a href="#details" className="w-full h-full flex items-center justify-center">Event Details</a>
-            </Button>
           </div>
         </div>
       </div>

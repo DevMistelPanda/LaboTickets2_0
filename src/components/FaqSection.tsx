@@ -10,36 +10,35 @@ import {
 const FaqSection = () => {
   const faqs = [
     {
-      question: "What is the dress code for the party?",
-      answer: "The dress code is semi-formal or summer chic. Think nice dresses, slacks, button-up shirts, etc. We want everyone to feel comfortable while looking their best!"
+      question: "Was ist der Dresscode für den Ball?",
+      answer: "Der Dresscode ist: Maske im venezianischen Stil. Wir empfehlen dir auch elegante Kleidung. Für inspirationen frag gerne unseren AK."},
+    {
+      question: "Wo bekomme ich Tickets?",
+      answer: "Die Tickets sind nach den Pfingstferien in den Pausen erhältlich."
     },
     {
-      question: "Are tickets refundable?",
-      answer: "Tickets are refundable up to 14 days before the event with a 10% processing fee. After that, tickets are non-refundable but can be transferred to another student."
+      question: "Dürfen Leute außerhalb der Schule teilnehmen?",
+      answer: "Nein. Der Schulball 2025 ist eine exklusive Veranstaltung für Schüler des Labenwolf Gymnasiums. Gäste von anderen Schulen sind leider nicht erlaubt."
     },
     {
-      question: "Can I bring a guest who doesn't attend our school?",
-      answer: "Yes, you can bring one guest who doesn't attend our school. However, you must register their information when purchasing your tickets, and they must bring ID to the event."
+      question: "Wird es was zu essen und trinken geben?",
+      answer: "Ja, wir werden eine Auswahl an Getränken und Brezeln verkaufen. Bitte bringt keine eigenen Speisen oder Getränke mit, da diese aus Sicherheitsgründen nicht erlaubt sind."
     },
     {
-      question: "Will food be provided at the party?",
-      answer: "Yes, we'll have a buffet dinner served from 8:00 PM to 9:30 PM. There will also be snacks and refreshments available throughout the evening. We accommodate various dietary restrictions - please note any requirements when you RSVP."
+      question: "Wann endet der Ball?",
+      answer: "Der Ball endet für die 5. - 8. Klassen um 20:00 Uhr. Für die 9. - 12. Klassen endet der Ball um 22:00 Uhr. Bitte plant eure Anreise und Abreise entsprechend."
     },
     {
-      question: "What time does the party end?",
-      answer: "The party officially ends at 12:00 AM. All students must arrange for transportation home at this time. The school grounds will close at 12:30 AM."
+      question: "Gibt es einen Wieder-Einlass?",
+      answer: "Nein, aus Sicherheitsgründen ist kein Wiedereinlass möglich. In speziellen Fällen kontaktiert bitte die Organisatoren vor Ort."
     },
     {
-      question: "Can I leave the party and come back?",
-      answer: "No, we have a no re-entry policy. Once you leave the venue, you cannot return for security reasons. Please make sure you have everything you need before arriving."
+      question: "Welche Gegenstände / Substanzen sind verboten?",
+      answer: "Verboten sind: Alkohol, Drogen, Waffen, Feuerwerkskörper und andere gefährliche Gegenstände. Bitte respektiert diese Regeln, um die Sicherheit aller Teilnehmer zu gewährleisten."
     },
     {
-      question: "What items are prohibited at the party?",
-      answer: "Prohibited items include: alcohol, drugs, vapes, outside food/drinks, weapons of any kind, and large bags. Small purses and clutches are allowed but may be subject to search."
-    },
-    {
-      question: "Will there be a coat/bag check?",
-      answer: "Yes, we will provide a free coat and small bag check. Please keep valuables with you as the school is not responsible for lost or stolen items."
+      question: "Wird es eine Taschenkontrolle geben?",
+      answer: "Ja, es wird eine Taschenkontrolle am Eingang geben. Bitte habt Verständnis dafür, dass wir aus Sicherheitsgründen keine großen Taschen oder Rucksäcke erlauben können. Wir respektieren eure Privatsphäre, sollte euch also etwas unangenehm sein, sprecht bitte die Organisatoren an."
     }
   ];
 
@@ -47,10 +46,10 @@ const FaqSection = () => {
     <section id="faq" className="py-16 md:py-24">
       <div className="section-container">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Die meisten Fragen</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            Got questions? We've got answers! Here are some of the most common questions about our school party.
+           Ihr habt Fragen? Wir haben die Antwort! Hier findet ihr die häufigsten Fragen und Antworten rund um den Schulball.
           </p>
         </div>
 
@@ -67,18 +66,6 @@ const FaqSection = () => {
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
-
-        <div className="mt-12 text-center">
-          <p className="text-lg mb-4">
-            Still have questions? Contact the event organizing committee.
-          </p>
-          <a 
-            href="#contact" 
-            className="text-party-purple hover:text-party-blue underline font-medium"
-          >
-            Get in touch with us
-          </a>
         </div>
       </div>
     </section>

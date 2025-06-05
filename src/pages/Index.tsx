@@ -11,7 +11,7 @@ import Footer from '@/components/Footer';
 const Index = () => {
   useEffect(() => {
     // Update document title
-    document.title = 'School Party 2025';
+    document.title = 'Schulball 2025 - Labenwolf Gymnasium';
     
     // Scroll to the top on page load
     window.scrollTo(0, 0);
