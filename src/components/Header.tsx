@@ -47,7 +47,7 @@ const Header = () => {
 
           <div className="hidden md:block">
             <Button className="bg-party-purple hover:bg-party-blue text-white rounded-full px-6">
-              <a href="#">Login</a>
+              <a href="./login">Login</a>
             </Button>
           </div>
 
