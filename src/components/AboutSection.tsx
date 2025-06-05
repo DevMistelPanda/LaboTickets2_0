@@ -5,18 +5,18 @@ const AboutSection = () => {
   const features = [
     {
       icon: <PartyPopper size={40} className="text-party-purple mb-4" />,
-      title: "Unforgettable Experience",
-      description: "A night filled with amazing performances, activities, and surprises that will create lasting memories."
+      title: "Unvergessliches Erlebnis",
+      description: "Eine Nacht voller Spaß, Musik und unvergesslicher Erinnerungen, die du nicht verpassen solltest!"
     },
     {
       icon: <Music size={40} className="text-party-purple mb-4" />,
-      title: "Live Music & DJ",
-      description: "Dance the night away with our professional DJ and live performances from talented student bands."
+      title: "Das erste mal mit DJ und Live-Bands",
+      description: "Genieße die besten Beats von unserem DJ und unserer Live-Band, die für die perfekte Stimmung sorgen werden."
     },
     {
       icon: <Users size={40} className="text-party-purple mb-4" />,
-      title: "Connect & Celebrate",
-      description: "An opportunity to connect with friends, meet new people, and celebrate the end of the academic year."
+      title: "Feiert gemeinsam mit Freunden",
+      description: "Treffe alte Freunde und knüpfe neue Bekanntschaften bei der besten Schulparty des Jahres!"
     }
   ];
 
@@ -27,7 +27,7 @@ const AboutSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">About the Party</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            The annual school party is back and bigger than ever! This year, we're transforming our school into the ultimate summer night paradise for an evening you won't forget.
+            Auch dieses Jahr ist es wieder soweit: Der Schulball steht vor der Tür! Wir freuen uns darauf, mit euch eine unvergessliche Nacht voller Musik, Tanz und guter Laune zu verbringen.
           </p>
         </div>
 
@@ -45,35 +45,31 @@ const AboutSection = () => {
         </div>
 
         <div className="mt-16 bg-white p-8 rounded-xl shadow-md">
-          <h3 className="text-2xl font-bold mb-4 text-center text-party-dark">What to Expect</h3>
+          <h3 className="text-2xl font-bold mb-4 text-center text-party-dark">Was erwartet euch</h3>
           <p className="text-party-gray mb-6">
-            Our Summer Night School Party is the perfect way to celebrate the end of the academic year. This year's theme embraces the magic of summer nights with:
-          </p>
-          <ul className="space-y-2 text-party-gray">
-            <li className="flex items-start">
-              <span className="text-party-purple mr-2">✓</span>
-              <span>Professionally decorated venue with summer night theme</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-party-purple mr-2">✓</span>
-              <span>Photo booth with props and professional photography</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-party-purple mr-2">✓</span>
-              <span>Delicious food and refreshments throughout the evening</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-party-purple mr-2">✓</span>
-              <span>Games, activities and entertainment for everyone</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-party-purple mr-2">✓</span>
-              <span>Special performances from talented students and professional artists</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-party-purple mr-2">✓</span>
-              <span>End-of-year awards and recognition ceremony</span>
-            </li>
+                Unsere Schulball ist der perfekte Weg, um das Ende des Schuljahres zu feiern. Mit dabei sind:
+                </p>
+                <ul className="space-y-2 text-party-gray">
+                <li className="flex items-start">
+                  <span className="text-party-purple mr-2">✓</span>
+                  <span>Ein professionell dekorierter Veranstaltungsort</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-party-purple mr-2">✓</span>
+                  <span>Fotowand mit Requisiten für die Perfekten Erinnerungen</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-party-purple mr-2">✓</span>
+                  <span>Erfrischungsgetränke werden über den ganzen Abend verkauft</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-party-purple mr-2">✓</span>
+                  <span>Ruhiger Bereich zum reden abseits der lauten Musik</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-party-purple mr-2">✓</span>
+                  <span>Musikwünsche sind immer Wilkommen</span>
+                </li>
           </ul>
         </div>
       </div>
