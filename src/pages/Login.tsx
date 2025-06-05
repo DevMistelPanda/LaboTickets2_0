@@ -8,8 +8,7 @@ const Login = () => {
         <div className="min-h-screen">
             <Header />
             <LoginForm />  
-            <Footer />
-                    
+            <Footer />    
         </div>
 
     );
