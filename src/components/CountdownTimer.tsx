@@ -1,33 +1,30 @@
 import { useEffect, useState } from 'react';
 
 const CountdownTimer = ({ targetDate }: { targetDate: string }) => {
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft());
-  const [hasEnded, setHasEnded] = useState(false);
-
-  function getTimeLeft() {
+  const calculateTimeLeft = () => {
     const difference = +new Date(targetDate) - +new Date();
-
-    if (difference <= 0) {
-      setHasEnded(true);
-      return {
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-      };
-    }
-
     return {
+      total: difference,
       days: Math.floor(difference / (1000 * 60 * 60 * 24)),
       hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
       minutes: Math.floor((difference / 1000 / 60) % 60),
       seconds: Math.floor((difference / 1000) % 60),
     };
-  }
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [hasEnded, setHasEnded] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(getTimeLeft());
+      const newTimeLeft = calculateTimeLeft();
+
+      if (newTimeLeft.total <= 0) {
+        clearInterval(timer);
+        setHasEnded(true);
+      } else {
+        setTimeLeft(newTimeLeft);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
@@ -35,7 +32,7 @@ const CountdownTimer = ({ targetDate }: { targetDate: string }) => {
 
   if (hasEnded) {
     return (
-      <div className="text-center text-2xl sm:text-3xl font-bold text-green-400">
+      <div className="text-center text-2xl sm:text-3xl font-bold text-purple-400">
         🎉 Der Schulball 2025 ist gestartet 🎉
       </div>
     );
