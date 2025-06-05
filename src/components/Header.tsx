@@ -16,7 +16,7 @@ const Header = () => {
   }, []);
 
   const navLinks = [
-    { name: 'About', href: '#about' },
+    { name: 'Infos', href: '#about' },
     { name: 'Details', href: '#details' },
     { name: 'Programm', href: '#schedule' },
     { name: 'FAQ', href: '#faq' },
@@ -28,7 +28,7 @@ const Header = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <a href="#" className="text-party-dark font-display font-bold text-xl md:text-2xl">
-              Labo Ball<span className="text-party-purple">25</span>
+              Schul Ball<span className="text-party-purple">25</span>
             </a>
           </div>
 
@@ -74,7 +74,7 @@ const Header = () => {
               </a>
             ))}
             <Button className="w-full bg-party-purple hover:bg-party-blue text-white rounded-full px-6 mt-4">
-              <a href="#rsvp" onClick={() => setIsMenuOpen(false)}>RSVP Now</a>
+              <a href="#" onClick={() => setIsMenuOpen(false)}>Login</a>
             </Button>
           </nav>
         )}
