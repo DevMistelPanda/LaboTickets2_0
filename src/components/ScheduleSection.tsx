@@ -60,7 +60,7 @@ const ScheduleSection = () => {
     <section id="schedule" className="py-16 md:py-24 bg-party-light-blue">
       <div className="section-container">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Party Program</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Party Programm</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
             A carefully planned evening to ensure everyone has a fantastic time. Here's what to expect.
