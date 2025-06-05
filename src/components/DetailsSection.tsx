@@ -1,28 +1,33 @@
 
-import { MapPin, Calendar, Clock, Users } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Euro } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const DetailsSection = () => {
   const details = [
     {
       icon: <Calendar size={28} className="text-party-purple" />,
-      title: "Date",
-      info: "Saturday, June 15, 2025"
+      title: "Datum",
+      info: "Samstag, Juli 15, 2025"
     },
     {
       icon: <Clock size={28} className="text-party-purple" />,
-      title: "Time",
-      info: "7:00 PM - 12:00 AM"
+      title: "Zeiten",
+      info: "16:00 Uhr - 22:00 Uhr"
     },
     {
       icon: <MapPin size={28} className="text-party-purple" />,
-      title: "Location",
-      info: "School Main Hall & Garden"
+      title: "Ort",
+      info: "In unserem Schulhof"
     },
     {
       icon: <Users size={28} className="text-party-purple" />,
       title: "Dress Code",
-      info: "Semi-formal / Summer Chic"
+      info: "Masken im venezianischen Stil"
+    },
+    {
+      icon: <Euro size={28} className="text-party-purple" />,
+      title: "Eintritt",
+      info: "Der Eintritt wird noch bekannt gegeben"
     }
   ];
 
@@ -33,7 +38,7 @@ const DetailsSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Event Details</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            Everything you need to know about the biggest school event of the year.
+            Alles was es zu wissen gibt zum Schulball 2025
           </p>
         </div>
 

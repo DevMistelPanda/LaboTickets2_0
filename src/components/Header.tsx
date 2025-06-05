@@ -18,9 +18,8 @@ const Header = () => {
   const navLinks = [
     { name: 'About', href: '#about' },
     { name: 'Details', href: '#details' },
-    { name: 'Schedule', href: '#schedule' },
+    { name: 'Programm', href: '#schedule' },
     { name: 'FAQ', href: '#faq' },
-    { name: 'Contact', href: '#contact' }
   ];
 
   return (
@@ -29,7 +28,7 @@ const Header = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <a href="#" className="text-party-dark font-display font-bold text-xl md:text-2xl">
-              School<span className="text-party-purple">Party</span>
+              Labo Ball<span className="text-party-purple">25</span>
             </a>
           </div>
 
@@ -48,7 +47,7 @@ const Header = () => {
 
           <div className="hidden md:block">
             <Button className="bg-party-purple hover:bg-party-blue text-white rounded-full px-6">
-              <a href="#rsvp">RSVP Now</a>
+              <a href="#">Login</a>
             </Button>
           </div>
 
