@@ -12,15 +12,44 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
+    <section className="relative h-screen flex items-center overflow-hidden">
+      {/* Background with gradient overlay */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-party-dark/80 to-party-purple/50 z-10"></div>
+        <div
+          className="w-full h-full bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')",
+          }}
+        ></div>
       </div>
-    </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
+        <div className="max-w-3xl animate-fade-in text-center">
+          <div className="text-6xl md:text-7xl font-extrabold mb-4">🎭 404</div>
+
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            Verirrt im Maskenball
+            <span className="block text-party-purple text-shadow mt-2">
+              Diese Seite tanzt nicht mit
+            </span>
+          </h1>
+
+          <p className="text-xl md:text-2xl mb-10 opacity-90">
+            Die Seite, die du suchst, ist wie eine verlorene Maske in der Nacht...
+          </p>
+
+          <a
+            href="/"
+            className="inline-block px-8 py-3 bg-party-purple text-white rounded-full text-lg font-medium hover:bg-party-purple/90 transition duration-300 shadow-lg"
+          >
+            Zurück zum Ballsaal
+          </a>
+        </div>
+      </div>
+    </section>
   );
 };
 
