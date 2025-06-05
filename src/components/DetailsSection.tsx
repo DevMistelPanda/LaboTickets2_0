@@ -63,7 +63,8 @@ const DetailsSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Event Details</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            Alles was es zu wissen gibt zum Schulball 2025
+            Alles was es zu wissen gibt zum Schulball 2025 <br />
+            Außerdem ein Paar inspirierende Bilder von Venezianischen Masken
           </p>
         </div>
 
