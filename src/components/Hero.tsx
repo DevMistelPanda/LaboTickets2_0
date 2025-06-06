@@ -24,7 +24,7 @@ const Hero = () => {
           {/* Countdown Timer using the component */}
           <div className="mb-8 bg-black/30 backdrop-blur-sm rounded-lg p-4">
             <p className="text-sm font-medium mb-2">Zeit bis zum Ball:</p>
-            <CountdownTimer targetDate="2025-07-15T16:00:00" />
+            <CountdownTimer targetDate="2025-07-25T16:00:00" />
           </div>
 
           <p className="text-xl md:text-2xl mb-8 opacity-90">
@@ -34,7 +34,7 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
             <div className="flex items-center">
               <Calendar className="mr-2 text-party-purple" size={24} />
-              <span className="text-lg">15. Juli 2025</span>
+              <span className="text-lg">25. Juli 2025</span>
             </div>
             <div className="flex items-center">
               <Clock className="mr-2 text-party-purple" size={24} />
