@@ -24,7 +24,7 @@ const Hero = () => {
           {/* Countdown Timer using the component */}
           <div className="mb-8 bg-black/30 backdrop-blur-sm rounded-lg p-4">
             <p className="text-sm font-medium mb-2">Zeit bis zum Ball:</p>
-            <CountdownTimer targetDate="2025-07-25T16:00:00" />
+            <CountdownTimer targetDate="2025-06-22T23:29:00" />
           </div>
 
           <p className="text-xl md:text-2xl mb-8 opacity-90">
