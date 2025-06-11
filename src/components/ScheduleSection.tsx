@@ -35,12 +35,6 @@ const ScheduleSection = () => {
   
   const performers = [
     {
-      name: "Unsere Live Band",
-      role: "TBA",
-      image: "TBA",
-      description: "Unsere Live Band wird den Abend mit toller Musik begleiten. Details folgen bald!"
-    },
-    {
       name: "DJ",
       role: "DJ",
       image: "TBA",
