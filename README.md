@@ -2,8 +2,9 @@
 
 ## Project info
 
-We are working on a nice simple representation for our School Project.
+This Project is for our Schulball Project.
 **URL**:sb.wintruff.de
 
-## How can I edit this code?
+## How can you Contribute?
+Feel free to contribute to this code and create Pull Requests etc. 
 
