@@ -37,7 +37,7 @@ const ScheduleSection = () => {
     {
       name: "DJ",
       role: "DJ",
-      image: "TBA",
+      image: "https://images.pexels.com/photos/63703/pexels-photo-63703.jpeg",
       description: "Unser AK Licht & Ton wrid den Abend mit einem DJ begleiten, der für die richtige Stimmung sorgt."
     },
     {
