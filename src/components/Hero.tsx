@@ -34,7 +34,7 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
             <div className="flex items-center">
               <Calendar className="mr-2 text-party-purple" size={24} />
-              <span className="text-lg">15. Juli 2025</span>
+              <span className="text-lg">25. Juli 2025</span>
             </div>
             <div className="flex items-center">
               <Clock className="mr-2 text-party-purple" size={24} />
