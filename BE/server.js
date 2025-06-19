@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 const dbConfig = {
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,       // added port here
+  port: process.env.DB_PORT, 
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -33,19 +33,19 @@ app.post('/api/login', async (req, res) => {
     const connection = await mysql.createConnection(dbConfig);
 
     const [rows] = await connection.execute(
-      'SELECT * FROM users WHERE email = ?',
+      'SELECT * FROM accounts WHERE username = ?',
       [email]
     );
 
     if (rows.length === 0) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
     }
 
     const user = rows[0];
     const inputHash = sha256(password);
 
     if (inputHash !== user.password) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
     }
 
     const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
@@ -56,7 +56,7 @@ app.post('/api/login', async (req, res) => {
     await connection.end();
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: '500 Server error' });
   }
 });
 
