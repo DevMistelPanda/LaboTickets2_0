@@ -59,14 +59,14 @@ const Login = () => {
 
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Benutzername"
             className="w-full p-3 border border-gray-300 rounded-lg"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
           <input
-            type="password"
+            type="Passwort"
             placeholder="Password"
             className="w-full p-3 border border-gray-300 rounded-lg"
             value={password}
