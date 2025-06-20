@@ -7,7 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage"; 
 import Scanner from "./pages/Scanner"
-
+import Purcase from "./pages/purcase" 
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -20,6 +20,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<LoginPage />} /> 
           <Route path="/scanner" element={<Scanner />}/>
+          <Route path="/purcase" element={<Purcase />}/>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
