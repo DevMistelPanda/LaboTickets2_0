@@ -16,10 +16,10 @@ const StaffHeader = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Ausgabe', href: '#' },
-    { name: 'Scanning', href: '#' },
-    { name: 'Staff Panel', href: '#' },
-    { name: 'Admin Panel', href: '#' },
+    { name: 'Ausgabe', href: './ausgabe' },
+    { name: 'Scanning', href: './scanning' },
+    { name: 'Staff Panel', href: './staff' },
+    { name: 'Admin Panel', href: './admin' },
   ];
 
   return (
