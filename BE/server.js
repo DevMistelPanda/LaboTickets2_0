@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 const dbConfig = {
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT, 
+  port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -26,11 +26,24 @@ function sha256(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
 
+// Test DB connection on startup
+async function testDatabaseConnection() {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    console.log('✅ Database connection successful');
+    await connection.end();
+  } catch (err) {
+    console.error('❌ Failed to connect to the database:', err);
+  }
+}
+
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
+  let connection;
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    connection = await mysql.createConnection(dbConfig);
+    console.log('✅ Successfully connected to the database');
 
     const [rows] = await connection.execute(
       'SELECT * FROM accounts WHERE username = ?',
@@ -53,12 +66,23 @@ app.post('/api/login', async (req, res) => {
     });
 
     res.json({ token });
-    await connection.end();
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('❌ Login error or DB connection failed:', err);
     res.status(500).json({ message: '500 Server error' });
+  } finally {
+    if (connection) {
+      try {
+        await connection.end();
+        console.log('🔌 Database connection closed');
+      } catch (closeErr) {
+        console.error('⚠️ Error closing the DB connection:', closeErr);
+      }
+    }
   }
 });
+
+// Run DB test, then start the server
+testDatabaseConnection();
 
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
