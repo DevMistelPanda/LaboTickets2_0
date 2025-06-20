@@ -38,7 +38,7 @@ async function testDatabaseConnection() {
 }
 
 app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   let connection;
   try {
@@ -47,7 +47,7 @@ app.post('/api/login', async (req, res) => {
 
     const [rows] = await connection.execute(
       'SELECT * FROM accounts WHERE username = ?',
-      [email]
+      [username]
     );
 
     if (rows.length === 0) {
@@ -61,7 +61,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
+    const token = jwt.sign({ id: user.id, username: user.username }, SECRET, {
       expiresIn: '2h',
     });
 
