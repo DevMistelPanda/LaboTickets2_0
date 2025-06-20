@@ -55,7 +55,7 @@ const Login = () => {
         >
           <h2 className="text-2xl font-bold text-center text-gray-800">Login</h2>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <input
             type="text"

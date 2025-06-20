@@ -113,7 +113,7 @@ const StaffPanel = () => {
           {/* Backend error message */}
           {backendError && (
             <div className="bg-red-600/80 text-white text-center px-4 py-3 rounded-md font-medium shadow">
-              ❌ Backend nicht erreichbar – bitte kontaktiere den Admin.
+              ❌ (503) Backend nicht erreichbar – bitte kontaktiere den Admin.
             </div>
           )}
 
