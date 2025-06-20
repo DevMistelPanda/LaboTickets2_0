@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 
-const Header = () => {
+const StaffHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -83,4 +83,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default StaffHeader;
