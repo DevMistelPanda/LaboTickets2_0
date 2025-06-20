@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,8 @@ const Login = () => {
       if (!res.ok) throw new Error(data.message || 'Login fehlgeschlagen');
 
       localStorage.setItem('token', data.token);
-      alert('Login erfolgreich!');
+      localStorage.setItem('username', username)
+      navigate('/staff');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -66,8 +69,8 @@ const Login = () => {
             required
           />
           <input
-            type="Passwort"
-            placeholder="Password"
+            type="password"
+            placeholder="Passwort"
             className="w-full p-3 border border-gray-300 rounded-lg"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

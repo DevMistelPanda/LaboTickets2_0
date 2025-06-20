@@ -19,33 +19,20 @@ const StaffPanel = () => {
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [backendError, setBackendError] = useState(false);
 
-  const fetchSessionData = async () => {
-    try {
-      const res = await fetch('/session-data', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
-      const data = await res.json();
-      setUsername(data.username === 'admin' ? 'Milan' : data.username);
-    } catch (err) {
-      console.error('Session fetch failed', err);
-      setBackendError(true);
-    }
-  };
-
   const fetchVisitorStats = async () => {
     try {
-      const res = await fetch('/api/visitors/stats');
-      const [data] = await res.json();
+      const res = await fetch('http://localhost:4000/api/visitors/stats');
+      const [data]: [VisitorStats] = await res.json(); 
       setVisStats(data);
     } catch (err) {
       console.error('Visitor stats error:', err);
       setBackendError(true);
     }
-  };
+};
 
   const fetchHotNews = async () => {
     try {
-      const res = await fetch('/api/news/hot');
+      const res = await fetch('https://localhost:4000/api/news/hot');
       const [data] = await res.json();
       setHotNews(data?.first_imp_news ?? '');
     } catch (err) {
@@ -56,7 +43,7 @@ const StaffPanel = () => {
 
   const fetchNewsList = async () => {
     try {
-      const res = await fetch('/api/news');
+      const res = await fetch('https://localhost:4000/api/news');
       const data = await res.json();
       setNewsList(data.reverse());
     } catch (err) {
@@ -66,7 +53,9 @@ const StaffPanel = () => {
   };
 
   useEffect(() => {
-    fetchSessionData();
+    const storedUsername = localStorage.getItem('username');
+    setUsername(storedUsername === 'admin' ? 'Milan' : storedUsername || 'Unbekannt');
+
     fetchVisitorStats();
     fetchHotNews();
     fetchNewsList();
