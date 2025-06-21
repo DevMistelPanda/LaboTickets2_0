@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage"; 
 import StaffPanel from "./pages/StaffPanel";
+import AdminPanel from "./pages/AdminPanel"
 
 const queryClient = new QueryClient();
 
@@ -29,7 +30,7 @@ const App = () => (
 
       {/* Admin only route */}
       <Route element={<RoleProtectedRoute allowedRoles={['admin']} />}>
-        <Route path="/admin" element={<StaffPanel />} />
+        <Route path="/admin" element={<AdminPanel />} />
       </Route>
 
       {/* Catch all */}
