@@ -1,19 +1,25 @@
-
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 const StaffHeader = () => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // 🧹 Clear token
+    toast.success("Logged out successfully."); // Optional
+    navigate('/login'); // Redirect
+  };
 
   const navLinks = [
     { name: 'Ausgabe', href: './ausgabe' },
@@ -46,16 +52,16 @@ const StaffHeader = () => {
           </nav>
 
           <div className="hidden md:block">
-            <Button className="bg-party-purple hover:bg-party-blue text-white rounded-full px-6">
-              <a href="./logout">Logout</a>
+            <Button
+              className="bg-party-purple hover:bg-party-blue text-white rounded-full px-6"
+              onClick={handleLogout}
+            >
+              Logout
             </Button>
           </div>
 
           {/* Mobile menu button */}
-          <button
-            className="md:hidden text-party-dark"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
+          <button className="md:hidden text-party-dark" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -73,8 +79,14 @@ const StaffHeader = () => {
                 {link.name}
               </a>
             ))}
-            <Button className="w-full bg-party-purple hover:bg-party-blue text-white rounded-full px-6 mt-4">
-              <a href="./logout" onClick={() => setIsMenuOpen(false)}>Login</a>
+            <Button
+              className="w-full bg-party-purple hover:bg-party-blue text-white rounded-full px-6 mt-4"
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleLogout();
+              }}
+            >
+              Logout
             </Button>
           </nav>
         )}
