@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleProtectedRoute from './components/RoleProtectedRoute';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage"; 
@@ -16,20 +17,25 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<LoginPage />} />
+        <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/staff" element={<StaffPanel />} />
-          </Route>
+      {/* Staff protected route (any logged-in user) */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/staff" element={<StaffPanel />} />
+      </Route>
 
-          {/* Catch-all for 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      {/* Admin only route */}
+      <Route element={<RoleProtectedRoute allowedRoles={['admin']} />}>
+        <Route path="/admin" element={<StaffPanel />} />
+      </Route>
+
+      {/* Catch all */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -1,6 +1,7 @@
 // components/ProtectedRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner"; 
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem("token");
@@ -13,13 +14,15 @@ const ProtectedRoute = () => {
       const isExpired = Date.now() >= exp * 1000;
 
       if (isExpired) {
-        localStorage.removeItem("token"); // 🧹 Remove expired token
+        localStorage.removeItem("token");
+        toast.error("Session expired. Please log in again.");
         return false;
       }
 
       return true;
     } catch {
-      localStorage.removeItem("token"); // 🧹 Remove invalid token
+      localStorage.removeItem("token");
+      toast.error("Invalid token. Please log in again.");
       return false;
     }
   })();

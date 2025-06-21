@@ -39,7 +39,7 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: 'Ungültiger Token' });
-    req.user = user;
+    req.user = user; // user contains { id, username, role, iat, exp }
     next();
   });
 }
@@ -79,11 +79,14 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
     }
 
-    const token = jwt.sign({ id: user.id, username: user.username }, SECRET, {
-      expiresIn: '2h',
-    });
+    // Include role in the token payload
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      SECRET,
+      { expiresIn: '2h' }
+    );
 
-    res.json({ token, username: user.username });
+    res.json({ token, username: user.username, role: user.role });
   } catch (err) {
     console.error('❌ Login error:', err);
     res.status(500).json({ message: 'Serverfehler' });
