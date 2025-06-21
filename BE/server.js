@@ -205,7 +205,7 @@ app.post('/api/news/sub_all', authenticateToken, async (req, res) => {
       'INSERT INTO news (imp_news, nr, news_title, news_text) VALUES (NULL, NULL, ?, ?)',
       [title, text]
     );
-    res.json({ message: 'ok' });
+    res.json({ message: 'News erfolgreich hinzugefügt' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Fehler beim Hinzufügen der News' });
