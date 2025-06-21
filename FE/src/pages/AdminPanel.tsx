@@ -1,90 +1,105 @@
-// pages/StaffPanel.tsx
 import { useEffect, useState } from 'react';
 import Header from '@/components/StaffHeader';
-
-type VisitorStats = {
-  total_visitors: number;
-  entered_visitors: number;
-};
-
-type NewsItem = {
-  imp_news: string | null;
-  nr: number | null;
-  news_title: string;
-  news_text: string;
-};
+import { toast, Toaster } from 'sonner';
 
 const AdminPanel = () => {
   const [username, setUsername] = useState('...');
-  const [visStats, setVisStats] = useState<VisitorStats | null>(null);
-  const [hotNews, setHotNews] = useState<string>('');
-  const [newsList, setNewsList] = useState<NewsItem[]>([]);
-  const [backendError, setBackendError] = useState(false);
-
-  const fetchVisitorStats = async () => {
-    try {
-      const res = await fetch('http://localhost:4000/api/visitors/stats');
-      const [data]: [VisitorStats] = await res.json(); 
-      setVisStats(data);
-    } catch (err) {
-      console.error('Visitor stats error:', err);
-      setBackendError(true);
-    }
-};
-
-const fetchHotNews = async () => {
-  try {
-    const res = await fetch('http://localhost:4000/api/news/hot'); // note: use http, not https
-    const data = await res.json(); // data is an array of objects
-
-    if (data.length > 0) {
-      setHotNews(data[0].first_imp_news);
-    } else {
-      setHotNews('');
-    }
-  } catch (err) {
-    console.error('Hot news error:', err);
-    setBackendError(true);
-  }
-};
-
-  const fetchNewsList = async () => {
-    try {
-      const res = await fetch('http://localhost:4000/api/news');
-      const data = await res.json();
-
-      setNewsList(data.reverse());
-    } catch (err) {
-      console.error('News list error:', err);
-      setBackendError(true);
-    }
-  };
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
     setUsername(storedUsername === 'admin' ? 'Milan' : storedUsername || 'Unbekannt');
 
-    fetchVisitorStats();
-    fetchHotNews();
-    fetchNewsList();
-
-    const interval = setInterval(fetchVisitorStats, 5000);
-    return () => clearInterval(interval);
+    const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
   }, []);
 
-  useEffect(() => {
-    if (backendError) {
-      const timer = setTimeout(() => setBackendError(false), 10000);
-      return () => clearTimeout(timer);
+  const handleImportantSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!token) {
+      toast.error('Nicht eingeloggt.');
+      return;
     }
-  }, [backendError]);
+
+    const formData = new FormData(e.currentTarget);
+    const hot_news = formData.get('hot_news');
+
+    if (!hot_news || typeof hot_news !== 'string') {
+      toast.error('Bitte wichtige News eingeben.');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:4000/api/news/sub_hot', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ hot_news }),
+      });
+
+      if (res.ok) {
+        e.currentTarget.reset();
+        toast.success('✅ Wichtige News erfolgreich gesendet!');
+      } else {
+        const data = await res.json();
+        toast.error(`❌ Fehler: ${data.message || 'Unbekannt'}`);
+      }
+    } catch {
+      toast.error('❌ Fehler beim Senden der wichtigen News.');
+    }
+  };
+
+  const handleNewsSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!token) {
+      toast.error('Nicht eingeloggt.');
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const title = formData.get('title');
+    const text = formData.get('text');
+
+    if (
+      !title ||
+      typeof title !== 'string' ||
+      !text ||
+      typeof text !== 'string'
+    ) {
+      toast.error('Bitte Titel und Text eingeben.');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:4000/api/news/sub_all', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, text }),
+      });
+
+      if (res.ok) {
+        e.currentTarget.reset();
+        toast.success('✅ Normale News erfolgreich gesendet!');
+      } else {
+        const data = await res.json();
+        toast.error(`❌ Fehler: ${data.message || 'Unbekannt'}`);
+      }
+    } catch {
+      toast.error('❌ Fehler beim Senden der normalen News.');
+    }
+  };
 
   return (
     <>
       <Header />
-
+      <Toaster position="top-center" richColors />
       <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden text-white px-4">
-        {/* Background like in Hero.tsx */}
+        {/* Background */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-r from-party-dark/80 to-party-purple/50 z-10"></div>
           <div
@@ -96,57 +111,57 @@ const fetchHotNews = async () => {
           />
         </div>
 
-        {/* Header text outside the box */}
         <div className="relative z-10 text-center mb-6 animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">
-            Willkommen im Staff Panel
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">Admin Panel</h1>
           <span className="block text-party-purple text-2xl mt-2">Hey {username} 👋</span>
         </div>
 
-        {/* Main content box */}
-        <div className="relative z-10 max-w-5xl w-full space-y-8 backdrop-blur-sm bg-black/30 rounded-lg shadow-xl p-8">
+        <div className="relative z-10 max-w-4xl w-full space-y-10 backdrop-blur-sm bg-black/30 rounded-lg shadow-xl p-8">
+          {/* Important News Form */}
+          <div>
+            <h2 className="text-2xl font-bold text-party-purple mb-4">Wichtige News</h2>
+            <form onSubmit={handleImportantSubmit} className="space-y-4">
+              <input
+                type="text"
+                name="hot_news"
+                placeholder="Wichtige News"
+                required
+                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="bg-party-purple hover:bg-party-purple/80 text-white font-semibold py-2 px-6 rounded shadow"
+              >
+                Absenden
+              </button>
+            </form>
+          </div>
 
-          {/* Backend error message */}
-          {backendError && (
-            console.log('503: Backend error occurred'),
-            <div className="bg-red-600/80 text-white text-center px-4 py-3 rounded-md font-medium shadow">
-              ❌ (503) Backend nicht erreichbar – bitte kontaktiere den Admin.
-            </div>
-          )}
-
-          {/* Hot news headline */}
-          {hotNews && (
-            <div className="bg-yellow-200/20 text-yellow-100 px-4 py-3 rounded-md text-center font-medium">
-              {hotNews}
-            </div>
-          )}
-
-          {/* Ticket counters */}
-          {visStats && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
-              <div className="bg-white/10 p-6 rounded-lg shadow">
-                <p className="text-3xl font-bold">{visStats.entered_visitors}</p>
-                <span className="text-lg text-white/80">Tickets gescannt</span>
-              </div>
-              <div className="bg-white/10 p-6 rounded-lg shadow">
-                <p className="text-3xl font-bold">{visStats.total_visitors}</p>
-                <span className="text-lg text-white/80">Karten verkauft</span>
-              </div>
-            </div>
-          )}
-
-          {/* News list */}
-          <div className="mt-10 space-y-4">
-            <h2 className="text-2xl font-bold text-party-purple">Neueste News</h2>
-            <div className="space-y-3">
-              {newsList.map((item, i) => (
-                <div key={i} className="bg-white/10 p-4 rounded-lg">
-                  <h3 className="font-semibold text-xl">{item.news_title}</h3>
-                  <p className="text-white/80">{item.news_text}</p>
-                </div>
-              ))}
-            </div>
+          {/* Normal News Form */}
+          <div>
+            <h2 className="text-2xl font-bold text-party-purple mb-4">Normale News</h2>
+            <form onSubmit={handleNewsSubmit} className="space-y-4">
+              <input
+                type="text"
+                name="title"
+                placeholder="Titel"
+                required
+                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none"
+              />
+              <textarea
+                name="text"
+                placeholder="Nachrichtentext"
+                required
+                rows={5}
+                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none resize-none"
+              />
+              <button
+                type="submit"
+                className="bg-party-purple hover:bg-party-purple/80 text-white font-semibold py-2 px-6 rounded shadow"
+              >
+                Absenden
+              </button>
+            </form>
           </div>
         </div>
       </section>
