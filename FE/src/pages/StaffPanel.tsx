@@ -30,23 +30,23 @@ const StaffPanel = () => {
       console.error('Visitor stats error:', err);
       setBackendError(true);
     }
-};
+  };
 
-const fetchHotNews = async () => {
-  try {
-    const res = await fetch('http://localhost:4000/api/news/hot'); // note: use http, not https
-    const data = await res.json(); // data is an array of objects
+  const fetchHotNews = async () => {
+    try {
+      const res = await fetch('http://localhost:4000/api/news/hot'); // note: use http, not https
+      const data = await res.json(); // data is an array of objects
 
-    if (data.length > 0) {
-      setHotNews(data[0].first_imp_news);
-    } else {
-      setHotNews('');
+      if (data.length > 0) {
+        setHotNews(data[0].first_imp_news);
+      } else {
+        setHotNews('');
+      }
+    } catch (err) {
+      console.error('Hot news error:', err);
+      setBackendError(true);
     }
-  } catch (err) {
-    console.error('Hot news error:', err);
-    setBackendError(true);
-  }
-};
+  };
 
   const fetchNewsList = async () => {
     try {
@@ -139,7 +139,7 @@ const fetchHotNews = async () => {
           {/* News list */}
           <div className="mt-10 space-y-4">
             <h2 className="text-2xl font-bold text-party-purple">Neueste News</h2>
-            <div className="space-y-3">
+            <div className="max-h-80 overflow-y-auto space-y-3 pr-2">
               {newsList.map((item, i) => (
                 <div key={i} className="bg-white/10 p-4 rounded-lg">
                   <h3 className="font-semibold text-xl">{item.news_title}</h3>
