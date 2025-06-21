@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const ExcelJS = require('exceljs');
+const path = require('path'); // 🔹 For static file serving
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -79,7 +80,6 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
     }
 
-    // Include role in the token payload
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
       SECRET,
@@ -128,16 +128,13 @@ app.get('/api/visitors/download', authenticateToken, async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Besucher Liste');
 
-    // Add headers
     const headers = fields.map(f => f.name);
     worksheet.addRow(headers);
 
-    // Add rows
     results.forEach(row => {
       worksheet.addRow(headers.map(header => row[header] ?? ''));
     });
 
-    // Set header styles and freeze row
     worksheet.getRow(1).eachCell(cell => {
       cell.font = { bold: true };
     });
@@ -251,9 +248,16 @@ app.post('/api/news/sub_pub', authenticateToken, async (req, res) => {
   }
 });
 
-// Start server after DB connection test
-testDatabaseConnection();
+// 🔹 Static file serving (frontend)
+app.use(express.static(path.join(__dirname, 'public')));
 
+// 🔹 Catch-all fallback for SPA routing
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// 🔹 Start server
+testDatabaseConnection();
 app.listen(PORT, () => {
-  console.log(`✅ Backend server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });

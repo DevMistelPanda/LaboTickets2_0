@@ -23,7 +23,7 @@ const StaffPanel = () => {
 
   const fetchVisitorStats = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/visitors/stats');
+      const res = await fetch('/api/visitors/stats');
       const [data]: [VisitorStats] = await res.json(); 
       setVisStats(data);
     } catch (err) {
@@ -34,7 +34,7 @@ const StaffPanel = () => {
 
   const fetchHotNews = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/news/hot'); // note: use http, not https
+      const res = await fetch('/api/news/hot'); // note: use http, not https
       const data = await res.json(); // data is an array of objects
 
       if (data.length > 0) {
@@ -50,7 +50,7 @@ const StaffPanel = () => {
 
   const fetchNewsList = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/news');
+      const res = await fetch('/api/news');
       const data = await res.json();
 
       setNewsList(data.reverse());

@@ -30,7 +30,7 @@ const AdminPanel = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:4000/api/news/sub_hot', {
+      const res = await fetch('/api/news/sub_hot', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ const AdminPanel = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:4000/api/news/sub_all', {
+      const res = await fetch('/api/news/sub_all', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
