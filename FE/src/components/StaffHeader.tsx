@@ -16,7 +16,10 @@ const StaffHeader = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // 🧹 Clear token
+    localStorage.removeItem('token');// 🧹 Clear token
+    localStorage.removeItem('username');// 🧹 Clear user
+    localStorage.removeItem('role'); // 🧹 Clear role
+    
     toast.success("Logged out successfully."); // Optional
     navigate('/login'); // Redirect
   };

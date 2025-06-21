@@ -32,6 +32,7 @@ const Login = () => {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', username)
+      localStorage.setItem('role', data.role);
       navigate('/staff');
     } catch (err: any) {
       setError(err.message);

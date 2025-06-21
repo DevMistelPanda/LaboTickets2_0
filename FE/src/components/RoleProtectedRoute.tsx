@@ -34,7 +34,7 @@ const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
 
     if (!allowedRoles.includes(decoded.role)) {
 
-        
+
       useEffect(() => {
         toast.error('Zugriff verweigert: Keine Berechtigung für diesen Bereich');
         const timer = setTimeout(() => setRedirect('/staff'), 1500); // 1.5s delay for toast visibility
