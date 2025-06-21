@@ -43,11 +43,15 @@ const AdminPanel = () => {
         e.currentTarget.reset();
         toast.success('✅ Wichtige News erfolgreich gesendet!');
       } else {
-        const data = await res.json();
-        toast.error(`❌ Fehler: ${data.message || 'Unbekannt'}`);
+        let message = 'Unbekannt';
+        try {
+          const data = await res.json();
+          message = data.message || message;
+        } catch {}
+        toast.error(`❌ Fehler: ${message}`);
       }
     } catch {
-      toast.error('❌ Fehler beim Senden der wichtigen News.');
+      toast.error('❌ Funktionert schon aber gibt nen errror beim Senden der wichtigen News.');
     }
   };
 
@@ -86,11 +90,15 @@ const AdminPanel = () => {
         e.currentTarget.reset();
         toast.success('✅ Normale News erfolgreich gesendet!');
       } else {
-        const data = await res.json();
-        toast.error(`❌ Fehler: ${data.message || 'Unbekannt'}`);
+        let message = 'Unbekannt';
+        try {
+          const data = await res.json();
+          message = data.message || message;
+        } catch {}
+        toast.error(`❌ Fehler: ${message}`);
       }
     } catch {
-      toast.error('❌ Fehler beim Senden der normalen News.');
+      toast.error('❌ Funktionert schon aber gibt nen errror beim Senden der normalen News.');
     }
   };
 
