@@ -8,6 +8,8 @@ type VisitorStats = {
 };
 
 type NewsItem = {
+  imp_news: string | null;
+  nr: number | null;
   news_title: string;
   news_text: string;
 };
@@ -15,7 +17,7 @@ type NewsItem = {
 const StaffPanel = () => {
   const [username, setUsername] = useState('...');
   const [visStats, setVisStats] = useState<VisitorStats | null>(null);
-  const [hotNews, setHotNews] = useState('');
+  const [hotNews, setHotNews] = useState<string>('');
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [backendError, setBackendError] = useState(false);
 
@@ -30,21 +32,27 @@ const StaffPanel = () => {
     }
 };
 
-  const fetchHotNews = async () => {
-    try {
-      const res = await fetch('https://localhost:4000/api/news/hot');
-      const [data] = await res.json();
-      setHotNews(data?.first_imp_news ?? '');
-    } catch (err) {
-      console.error('Hot news error:', err);
-      setBackendError(true);
+const fetchHotNews = async () => {
+  try {
+    const res = await fetch('http://localhost:4000/api/news/hot'); // note: use http, not https
+    const data = await res.json(); // data is an array of objects
+
+    if (data.length > 0) {
+      setHotNews(data[0].first_imp_news);
+    } else {
+      setHotNews('');
     }
-  };
+  } catch (err) {
+    console.error('Hot news error:', err);
+    setBackendError(true);
+  }
+};
 
   const fetchNewsList = async () => {
     try {
-      const res = await fetch('https://localhost:4000/api/news');
+      const res = await fetch('http://localhost:4000/api/news');
       const data = await res.json();
+
       setNewsList(data.reverse());
     } catch (err) {
       console.error('News list error:', err);
@@ -101,6 +109,7 @@ const StaffPanel = () => {
 
           {/* Backend error message */}
           {backendError && (
+            console.log('503: Backend error occurred'),
             <div className="bg-red-600/80 text-white text-center px-4 py-3 rounded-md font-medium shadow">
               ❌ (503) Backend nicht erreichbar – bitte kontaktiere den Admin.
             </div>
