@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage"; 
@@ -19,8 +20,13 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/staff" element={<StaffPanel />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/staff" element={<StaffPanel />} />
+          </Route>
+
+          {/* Catch-all for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

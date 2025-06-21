@@ -1,11 +1,21 @@
-import { Navigate } from 'react-router-dom';
-import { isLoggedIn } from '@/utils/auth';
+// components/ProtectedRoute.tsx or .jsx
+import { Navigate, Outlet } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  if (!isLoggedIn()) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
+const ProtectedRoute = () => {
+  const token = localStorage.getItem("token");
+
+  const isAuthenticated = (() => {
+    try {
+      if (!token) return false;
+      const { exp } = jwtDecode(token);
+      return Date.now() < exp * 1000;
+    } catch {
+      return false;
+    }
+  })();
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute;
