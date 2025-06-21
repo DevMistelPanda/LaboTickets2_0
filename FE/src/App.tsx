@@ -8,6 +8,8 @@ import RoleProtectedRoute from './components/RoleProtectedRoute';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage"; 
+import Scanner from "./pages/Scanner"
+import Purcase from "./pages/purcase" 
 import StaffPanel from "./pages/StaffPanel";
 import AdminPanel from "./pages/AdminPanel"
 
@@ -26,6 +28,8 @@ const App = () => (
       {/* Staff protected route (any logged-in user) */}
       <Route element={<ProtectedRoute />}>
         <Route path="/staff" element={<StaffPanel />} />
+        <Route path="/scanner" element={<Scanner />}/>
+        <Route path="/purcase" element={<Purcase />}/>
       </Route>
 
       {/* Admin only route */}
