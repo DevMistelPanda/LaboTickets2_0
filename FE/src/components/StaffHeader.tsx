@@ -1,25 +1,34 @@
-
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import { toast } from 'sonner';
 
-const Header = () => {
+const StaffHeader = () => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');// 🧹 Clear token
+    localStorage.removeItem('username');// 🧹 Clear user
+    localStorage.removeItem('role'); // 🧹 Clear role
+    
+    toast.success("Logged out successfully."); // Optional
+    navigate('/login'); // Redirect
+  };
+
   const navLinks = [
-    { name: 'Infos', href: './#about' },
-    { name: 'Details', href: './#details' },
-    { name: 'Programm', href: './#schedule' },
-    { name: 'FAQ', href: './#faq' },
+    { name: 'Ausgabe', href: './ausgabe' },
+    { name: 'Scanning', href: './scanning' },
+    { name: 'Staff Panel', href: './staff' },
+    { name: 'Admin Panel', href: './admin' },
   ];
 
   return (
@@ -46,16 +55,16 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:block">
-            <Button className="bg-party-purple hover:bg-party-blue text-white rounded-full px-6">
-              <a href="./login">Login</a>
+            <Button
+              className="bg-party-purple hover:bg-party-blue text-white rounded-full px-6"
+              onClick={handleLogout}
+            >
+              Logout
             </Button>
           </div>
 
           {/* Mobile menu button */}
-          <button
-            className="md:hidden text-party-dark"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
+          <button className="md:hidden text-party-dark" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -73,8 +82,14 @@ const Header = () => {
                 {link.name}
               </a>
             ))}
-            <Button className="w-full bg-party-purple hover:bg-party-blue text-white rounded-full px-6 mt-4">
-              <a href="#" onClick={() => setIsMenuOpen(false)}>Login</a>
+            <Button
+              className="w-full bg-party-purple hover:bg-party-blue text-white rounded-full px-6 mt-4"
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleLogout();
+              }}
+            >
+              Logout
             </Button>
           </nav>
         )}
@@ -83,4 +98,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default StaffHeader;
