@@ -7,6 +7,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const ExcelJS = require('exceljs');
 const path = require('path'); // 🔹 For static file serving
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -75,8 +76,10 @@ app.post('/api/login', async (req, res) => {
     }
 
     const user = rows[0];
-    const inputHash = sha256(password);
-    if (inputHash !== user.password) {
+    const storedHash = user.password;
+    // Use bcrypt to compare password
+    const isMatch = await bcrypt.compare(password, storedHash);
+    if (!isMatch) {
       return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
     }
 
