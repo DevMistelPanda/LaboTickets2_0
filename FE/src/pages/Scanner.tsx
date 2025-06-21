@@ -1,7 +1,7 @@
 // Scanner.jsx
 import React, { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr"; // Du kannst es mit npm installieren: npm install jsqr
-import "./scanner.css";
+//import "./scanner.css";
 
 export default function Scanner() {
   const canvasRef = useRef(null);
@@ -66,7 +66,6 @@ export default function Scanner() {
           />
         </div>
         <input type="submit" value="submit" />
-        <input type="button" value="Zurück" onClick={() => window.location = "./staff"} />
       </form>
 
       <div id="container">

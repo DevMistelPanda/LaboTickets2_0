@@ -249,11 +249,11 @@ app.post('/api/news/sub_pub', authenticateToken, async (req, res) => {
 });
 
 // 🔹 Static file serving (frontend)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // 🔹 Catch-all fallback for SPA routing
 app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // 🔹 Start server
