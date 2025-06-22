@@ -1,5 +1,28 @@
+// PurchaseForm.jsx
 import React, { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
+
+function PopupBox({ confirmedName, confirmedKlasse, confirmedCode, onClose }) {
+  return (
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full space-y-4 text-center">
+        <h3 className="text-2xl font-bold text-green-600">Verkauf erfolgreich!</h3>
+        <p className="text-gray-800">
+          Verkauf erfolgreich an{" "}
+          <span className="font-semibold">{confirmedName}</span>, Klasse{" "}
+          <span className="font-semibold">{confirmedKlasse}</span>, Ticketcode:{" "}
+          <span className="font-mono">{confirmedCode}</span>
+        </p>
+        <button
+          onClick={onClose}
+          className="mt-4 bg-party-purple text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 transition"
+        >
+          Schließen
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function PurchaseForm() {
   const canvasRef = useRef(null);
@@ -98,14 +121,13 @@ export default function PurchaseForm() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    // kurze Form des Namens: jeweils erste 2 Buchstaben
+    // Kurze Form des Namens: jeweils erste 2 Buchstaben
     const shortName = name
       .trim()
       .split(" ")
       .map((part) => part.slice(0, 2))
       .join(" ");
 
-    // Backend-Request: Besucher in DB eintragen
     try {
       const response = await fetch("/api/visitors/purchase", {
         method: "POST",
@@ -128,34 +150,31 @@ export default function PurchaseForm() {
       return;
     }
 
+    // Zustände aktualisieren und Popup anzeigen
     setConfirmedName(shortName);
     setConfirmedKlasse(klasse.trim());
     setConfirmedCode(code.trim());
     setShowConfirmation(true);
   };
 
+  // Bei Schließen des Popups die Eingabefelder zurücksetzen
+  const handleClosePopup = () => {
+    setShowConfirmation(false);
+    setName("");
+    setKlasse("");
+    setCode("");
+    setErrors({});
+  };
+
   return (
     <>
       {showConfirmation && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full space-y-4 text-center">
-            <h3 className="text-2xl font-bold text-green-600">
-              Verkauf erfolgreich!
-            </h3>
-            <p className="text-gray-800">
-              Ticket verkauft an{" "}
-              <span className="font-semibold">{confirmedName}</span>, Klasse{" "}
-              <span className="font-semibold">{confirmedKlasse}</span>, Code{" "}
-              <span className="font-mono">{confirmedCode}</span>
-            </p>
-            <button
-              onClick={() => setShowConfirmation(false)}
-              className="mt-4 bg-party-purple text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 transition"
-            >
-              Schließen
-            </button>
-          </div>
-        </div>
+        <PopupBox
+          confirmedName={confirmedName}
+          confirmedKlasse={confirmedKlasse}
+          confirmedCode={confirmedCode}
+          onClose={handleClosePopup}
+        />
       )}
 
       <div className="relative w-full h-screen">
