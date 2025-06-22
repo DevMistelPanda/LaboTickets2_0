@@ -40,7 +40,10 @@ const StatsDashboard = () => {
 
     fetch('/api/stats/entered-over-time')
       .then(res => res.json())
-      .then(setEnteredOverTime);
+      .then(data => {
+        // Filter out entries where hour is "NULL"
+        setEnteredOverTime(data.filter((d: { hour: string }) => d.hour !== "NULL"));
+      });
 
     fetch('/api/stats/sales-per-user')
       .then(res => res.json())
