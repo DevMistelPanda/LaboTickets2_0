@@ -63,5 +63,8 @@ for /D %%D in (BE\*) do (
 )
 
 echo Build complete: %BUILD_DIR%
+cd "%BUILD_DIR%"
+echo installing dependencies...
+call npm install
 endlocal
 pause

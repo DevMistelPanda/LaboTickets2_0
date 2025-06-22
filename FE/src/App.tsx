@@ -10,6 +10,8 @@ import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage"; 
 import StaffPanel from "./pages/StaffPanel";
 import AdminPanel from "./pages/AdminPanel"
+import Purchase from "./pages/purcase";
+import Scanner from "./pages/Scanner";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
       {/* Staff protected route (any logged-in user) */}
       <Route element={<ProtectedRoute />}>
         <Route path="/staff" element={<StaffPanel />} />
+        <Route path="/purchase" element={<Purchase />} />
+        <Route path="/scanner" element={<Scanner />} />
       </Route>
 
       {/* Admin only route */}
