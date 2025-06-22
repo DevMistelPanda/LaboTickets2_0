@@ -312,6 +312,25 @@ app.get('/api/stats/entered-over-time', async (req, res) => {
   }
 });
 
+// Tickets sold per user
+app.get('/api/stats/sales-per-user', async (req, res) => {
+  try {
+    const [results] = await pool.query(`
+      SELECT 
+        user AS username,
+        COUNT(*) AS sold
+      FROM besucher
+      WHERE user IS NOT NULL AND user != ''
+      GROUP BY username
+      ORDER BY sold DESC
+    `);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Verkaufszahlen pro Benutzer' });
+  }
+});
+
 // 🔹 Static file serving (frontend)
 app.use(express.static(path.join(__dirname, 'dist')));
 

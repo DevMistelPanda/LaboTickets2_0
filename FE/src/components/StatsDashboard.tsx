@@ -27,6 +27,7 @@ const StatsDashboard = () => {
   const [salesOverTime, setSalesOverTime] = useState<{ date: string; sold: number }[]>([]);
   const [salesPerClass, setSalesPerClass] = useState<{ class_number: string; sold: number }[]>([]);
   const [enteredOverTime, setEnteredOverTime] = useState<{ hour: string; entered: number }[]>([]);
+  const [salesPerUser, setSalesPerUser] = useState<{ username: string; sold: number }[]>([]);
 
   useEffect(() => {
     fetch('/api/stats/sales-over-time')
@@ -40,6 +41,10 @@ const StatsDashboard = () => {
     fetch('/api/stats/entered-over-time')
       .then(res => res.json())
       .then(setEnteredOverTime);
+
+    fetch('/api/stats/sales-per-user')
+      .then(res => res.json())
+      .then(setSalesPerUser);
   }, []);
 
   return (
@@ -124,6 +129,46 @@ const StatsDashboard = () => {
             },
           }}
         />
+      </div>
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Tickets verkauft pro Benutzer</h2>
+        <Bar
+          data={{
+            labels: salesPerUser.map(d => d.username),
+            datasets: [
+              {
+                label: 'Tickets verkauft',
+                data: salesPerUser.map(d => d.sold),
+                backgroundColor: salesPerUser.map((_, idx) =>
+                  idx === 0 ? '#f59e42' : '#6366f1' // Highlight top seller
+                ),
+              },
+            ],
+          }}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              title: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `Tickets verkauft: ${context.parsed.y}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: { title: { display: true, text: 'Benutzer' } },
+              y: { title: { display: true, text: 'Tickets verkauft' }, beginAtZero: true },
+            },
+          }}
+        />
+        {salesPerUser.length > 0 && (
+          <div className="mt-2 text-center font-semibold text-orange-500">
+            🏆 Top Verkäufer: {salesPerUser[0].username} ({salesPerUser[0].sold} Tickets)
+          </div>
+        )}
       </div>
         </div>
     </section>
