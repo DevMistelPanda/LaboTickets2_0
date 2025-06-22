@@ -86,20 +86,13 @@ const DetailsSection = () => {
             </div>
           </div>
 
-          {/* Pinterest Embed */}
-          <div
-            ref={pinterestRef}
-            className="rounded-xl overflow-hidden shadow-md h-[450px] flex items-center justify-center"
-          >
-            <a
-              data-pin-do="embedBoard"
-              data-pin-board-width="600"
-              data-pin-scale-height="400"
-              data-pin-scale-width="90"
-              href="https://www.pinterest.com/08t5h67rdqdlfcq/beautiful-nature/"
-            >
-              Pinterest Board
-            </a>
+          {/* Image replacing Pinterest Embed */}
+          <div className="rounded-xl overflow-hidden shadow-md h-[450px] flex items-center justify-center bg-white">
+            <img
+              src="/images/Inspo2025.png"
+              alt="Venezianische Masken Inspiration 2025"
+              className="object-cover w-full h-full"
+            />
           </div>
         </div>
       </div>
