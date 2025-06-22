@@ -42,6 +42,8 @@ mkdir "%BUILD_DIR%"
 :: Step 3: Copy FE build
 echo Copying FE build output...
 xcopy /E /I /Y "FE\dist" "%BUILD_DIR%\dist"
+rmdir /s /q .\FE\dist 
+echo Cleaned up FE dist directory.
 
 :: Step 4: Copy BE contents (excluding .env and node_modules)
 echo Copying BE files and folders...
