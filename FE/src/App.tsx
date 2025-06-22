@@ -22,6 +22,7 @@ const App = () => (
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/login" element={<LoginPage />} />
+       <Route path="/admin" element={<AdminPanel />} />
 
       {/* Staff protected route (any logged-in user) */}
       <Route element={<ProtectedRoute />}>

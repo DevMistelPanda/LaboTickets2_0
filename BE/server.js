@@ -8,10 +8,12 @@ const bodyParser = require('body-parser');
 const ExcelJS = require('exceljs');
 const path = require('path'); // 🔹 For static file serving
 const bcrypt = require('bcrypt');
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas'); // Add this at the top
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 const SECRET = process.env.JWT_SECRET;
+const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -44,6 +46,16 @@ function authenticateToken(req, res, next) {
     req.user = user; // user contains { id, username, role, iat, exp }
     next();
   });
+}
+
+// Middleware to check Discord bot token
+function authenticateDiscordBot(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token || token !== DISCORD_BOT_TOKEN) {
+    return res.status(401).json({ message: 'Unauthorized: Invalid or missing bot token' });
+  }
+  next();
 }
 
 // Test DB connection on startup
@@ -248,6 +260,249 @@ app.post('/api/news/sub_pub', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Fehler beim Aktualisieren der Pub News' });
+  }
+});
+
+// Tickets sold over time (by day)
+app.get('/api/stats/sales-over-time', async (req, res) => {
+  try {
+    // Parse vdate (VARCHAR) as date using STR_TO_DATE
+    const [results] = await pool.query(`
+      SELECT 
+        DATE(STR_TO_DATE(vdate, '%d/%m/%Y')) AS date, 
+        COUNT(*) AS sold
+      FROM besucher
+      WHERE vdate IS NOT NULL AND vdate != ''
+      GROUP BY DATE(STR_TO_DATE(vdate, '%d/%m/%Y'))
+      ORDER BY DATE(STR_TO_DATE(vdate, '%d/%m/%Y'))
+    `);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Verkaufsdaten' });
+  }
+});
+
+// Tickets sold per class (numbers only)
+app.get('/api/stats/sales-per-class', async (req, res) => {
+  try {
+    // Sortiere explizit nach Klassen 5-13 in der gewünschten Reihenfolge
+    const [results] = await pool.query(`
+      SELECT 
+        REGEXP_REPLACE(class, '[^0-9]', '') AS class_number,
+        COUNT(*) AS sold
+      FROM besucher
+      WHERE class IS NOT NULL AND class != ''
+      GROUP BY class_number
+      HAVING class_number IN ('5','6','7','8','9','10','11','12','13')
+      ORDER BY FIELD(class_number, '5','6','7','8','9','10','11','12','13')
+    `);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Fehler beim Abrufen der klassendaten' });
+  }
+});
+
+// People entered over time (by entry HOUR, date irrelevant)
+app.get('/api/stats/entered-over-time', async (req, res) => {
+  try {
+    // Extract hour from edate (VARCHAR) using STR_TO_DATE and TIME_FORMAT
+    const [results] = await pool.query(`
+      SELECT 
+        LPAD(HOUR(STR_TO_DATE(SUBSTRING_INDEX(edate, ',', -1), ' %H:%i:%s')), 2, '0') AS hour,
+        COUNT(*) AS entered
+      FROM besucher
+      WHERE edate IS NOT NULL AND edate != ''
+      GROUP BY hour
+      HAVING hour >= '15' AND hour <= '22'
+      ORDER BY hour
+    `);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Eintrittszeiten' });
+  }
+});
+
+// Tickets sold per user
+app.get('/api/stats/sales-per-user', async (req, res) => {
+  try {
+    const [results] = await pool.query(`
+      SELECT 
+        user AS username,
+        COUNT(*) AS sold
+      FROM besucher
+      WHERE user IS NOT NULL AND user != ''
+      GROUP BY username
+      ORDER BY sold DESC
+    `);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Verkaufszahlen pro Benutzer' });
+  }
+});
+
+// Chart image endpoint for Discord bot or other integrations
+app.get('/api/stats/chart/:type/image', authenticateDiscordBot, async (req, res) => {
+  const { type } = req.params;
+  const width = 900;
+  const height = 500;
+  const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
+
+  // --- User authentication (same as /api/login) ---
+  const username = req.headers['x-username'];
+  const password = req.headers['x-password'];
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Benutzername und Passwort erforderlich' });
+  }
+  try {
+    const [rows] = await pool.execute(
+      'SELECT * FROM accounts WHERE username = ?',
+      [username]
+    );
+    if (rows.length === 0) {
+      return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
+    }
+    const user = rows[0];
+    const storedHash = user.password;
+    const isMatch = await bcrypt.compare(password, storedHash);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
+    }
+  } catch (err) {
+    console.error('Chart image user auth error:', err);
+    return res.status(500).json({ message: 'Serverfehler bei Authentifizierung' });
+  }
+  // --- End user authentication ---
+
+  let chartConfig = null;
+
+  try {
+    if (type === 'sales-over-time') {
+      const [results] = await pool.query(`
+        SELECT 
+          DATE(STR_TO_DATE(vdate, '%d/%m/%Y')) AS date, 
+          COUNT(*) AS sold
+        FROM besucher
+        WHERE vdate IS NOT NULL AND vdate != ''
+        GROUP BY DATE(STR_TO_DATE(vdate, '%d/%m/%Y'))
+        ORDER BY DATE(STR_TO_DATE(vdate, '%d/%m/%Y'))
+      `);
+      chartConfig = {
+        type: 'line',
+        data: {
+          labels: results.map(d => d.date ? d.date.toISOString().split('T')[0] : ''),
+          datasets: [{
+            label: 'Tickets verkauft',
+            data: results.map(d => d.sold),
+            fill: false,
+            borderColor: '#7c3aed',
+            backgroundColor: '#a78bfa',
+            tension: 0.2,
+          }]
+        },
+        options: {
+          plugins: { legend: { display: true }, title: { display: false } }
+        }
+      };
+    } else if (type === 'sales-per-class') {
+      const [results] = await pool.query(`
+        SELECT 
+          REGEXP_REPLACE(class, '[^0-9]', '') AS class_number,
+          COUNT(*) AS sold
+        FROM besucher
+        WHERE class IS NOT NULL AND class != ''
+        GROUP BY class_number
+        HAVING class_number IN ('5','6','7','8','9','10','11','12','13')
+        ORDER BY FIELD(class_number, '5','6','7','8','9','10','11','12','13')
+      `);
+      chartConfig = {
+        type: 'bar',
+        data: {
+          labels: results.map(d => d.class_number),
+          datasets: [{
+            label: 'Tickets verkauft',
+            data: results.map(d => d.sold),
+            backgroundColor: '#7c3aed'
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false }, title: { display: false } },
+          scales: {
+            x: { title: { display: true, text: 'Klasse' } },
+            y: { title: { display: true, text: 'Tickets verkauft' }, beginAtZero: true }
+          }
+        }
+      };
+    } else if (type === 'entered-over-time') {
+      const [results] = await pool.query(`
+        SELECT 
+          LPAD(HOUR(STR_TO_DATE(SUBSTRING_INDEX(edate, ',', -1), ' %H:%i:%s')), 2, '0') AS hour,
+          COUNT(*) AS entered
+        FROM besucher
+        WHERE edate IS NOT NULL AND edate != ''
+        GROUP BY hour
+        HAVING hour >= '15' AND hour <= '22'
+        ORDER BY hour
+      `);
+      chartConfig = {
+        type: 'bar',
+        data: {
+          labels: results.map(d => `${d.hour}:00`),
+          datasets: [{
+            label: 'Eintritte',
+            data: results.map(d => d.entered),
+            backgroundColor: '#7c3aed'
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false }, title: { display: false } },
+          scales: {
+            x: { title: { display: true, text: 'Uhrzeit' } },
+            y: { title: { display: true, text: 'Eintritte' }, beginAtZero: true }
+          }
+        }
+      };
+    } else if (type === 'sales-per-user') {
+      const [results] = await pool.query(`
+        SELECT 
+          user AS username,
+          COUNT(*) AS sold
+        FROM besucher
+        WHERE user IS NOT NULL AND user != ''
+        GROUP BY username
+        ORDER BY sold DESC
+      `);
+      chartConfig = {
+        type: 'bar',
+        data: {
+          labels: results.map(d => d.username),
+          datasets: [{
+            label: 'Tickets verkauft',
+            data: results.map(d => d.sold),
+            backgroundColor: results.map((_, idx) => idx === 0 ? '#f59e42' : '#6366f1')
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false }, title: { display: false } },
+          scales: {
+            x: { title: { display: true, text: 'Benutzer' } },
+            y: { title: { display: true, text: 'Tickets verkauft' }, beginAtZero: true }
+          }
+        }
+      };
+    } else {
+      return res.status(400).json({ message: 'Ungültiger Chart-Typ' });
+    }
+
+    const image = await chartJSNodeCanvas.renderToBuffer(chartConfig, 'image/png');
+    res.set('Content-Type', 'image/png');
+    res.send(image);
+  } catch (err) {
+    console.error('Chart image error:', err);
+    res.status(500).json({ message: 'Fehler beim Generieren des Diagramms' });
   }
 });
 
