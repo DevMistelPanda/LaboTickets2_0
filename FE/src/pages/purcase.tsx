@@ -19,6 +19,21 @@ export default function PurchaseForm() {
   const [confirmedCode, setConfirmedCode] = useState("");
   const [confirmedID,  setConfirmedID] = useState("");
 
+    //clear values of input fields after use
+
+    const clearForm = () => {
+  setName("");
+  setKlasse("");
+  setCode("");
+  setErrors({});
+  setScannerVisible(false);
+  setConfirmedName("");
+  setConfirmedKlasse("");
+  setConfirmedCode("");
+  setConfirmedID("");
+};
+
+
   useEffect(() => {
     if (!scannerVisible) return;
     const video = videoRef.current;
@@ -174,11 +189,15 @@ export default function PurchaseForm() {
               <span className="font-mono">{confirmedCode}</span>
             </p>
             <button
-              onClick={() => setShowConfirmation(false)}
-              className="mt-4 bg-party-purple text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 transition"
-            >
-              Schließen
-            </button>
+        onClick={() => {
+          // Overlay schließen
+          setShowConfirmation(false);
+          clearForm();
+        }}
+        className="mt-4 bg-party-purple text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 transition"
+      >
+        Schließen
+      </button>
           </div>
         </div>
       )}
