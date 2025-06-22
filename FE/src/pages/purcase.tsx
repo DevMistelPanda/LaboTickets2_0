@@ -17,6 +17,7 @@ export default function PurchaseForm() {
   const [confirmedName, setConfirmedName] = useState("");
   const [confirmedKlasse, setConfirmedKlasse] = useState("");
   const [confirmedCode, setConfirmedCode] = useState("");
+  const [confirmedID,  setConfirmedID] = useState("");
 
   useEffect(() => {
     if (!scannerVisible) return;
@@ -118,11 +119,10 @@ export default function PurchaseForm() {
     if (!validateForm()) return;
 
     // kurze Form des Namens: jeweils erste 2 Buchstaben
-    const shortName = name
-      .trim()
-      .split(" ")
-      .map((part) => part.slice(0, 2))
-      .join(" ");
+    const split_name = name.split(" ")
+    const vn = split_name[0].substring(0, 2)
+    const nn = split_name[1].substring(0, 2)
+    const shortName = vn + " " + nn;
 
     // Backend-Request: Besucher in DB eintragen
     try {
@@ -152,6 +152,7 @@ export default function PurchaseForm() {
     setConfirmedName(shortName);
     setConfirmedKlasse(klasse.trim());
     setConfirmedCode(code.trim());
+    setConfirmedID(code.substring(4, 8));
     setShowConfirmation(true);
   };
 
