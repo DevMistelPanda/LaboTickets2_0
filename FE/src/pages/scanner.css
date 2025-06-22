@@ -1,32 +1,14 @@
+
+
 * {
   font-family: -apple-system, BlinkMacSystemFont, "segoe ui", roboto, oxygen, ubuntu, cantarell, "fira sans", "droid sans", "helvetica neue", Arial, sans-serif;
   font-size: 16px;
 }
 
-body {
-  overflow: hidden;
-  align-items: center;
-  min-height: 100vh;
-  font-family: Hack, monospace;
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-  background-size: 400% 400%;
-  animation: gradient 120s ease infinite;
-}
 
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
 
 h1 {
-  color: #5b6574;
+  color: #8f9bac;
   text-align: center;
   margin: 0 auto;
   padding: 20px 0 20px 0;
@@ -82,7 +64,13 @@ form {
   }
   
 #btn-scan-qr {
-     width: 400px  ;
+     width: 100%;
+    box-sizing: border-box;
+    height: 50px;
+    border: 2px solid lightgrey ;
+    margin-bottom: 2px;
+    padding: 0 15px;
+    font-size: 16px;
       background-color: darkcyan;
       color: white;
       cursor: pointer;
@@ -93,6 +81,7 @@ form {
     background-color: rgb(0, 121, 121);
   }
 
+  
 
 #form {
   width: 300px;

@@ -1,7 +1,7 @@
 // Scanner.jsx
 import React, { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr"; // Du kannst es mit npm installieren: npm install jsqr
-import "./scanner.css";
+
 
 export default function Scanner() {
   const canvasRef = useRef(null);

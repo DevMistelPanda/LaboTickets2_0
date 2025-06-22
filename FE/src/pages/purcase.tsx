@@ -96,6 +96,7 @@ export default function PurchaseForm() {
   };
 
   return (
+    <body className="purcase">
     <div className="container">
       <form onSubmit={handleSubmit} id="ausgabe">
         <h1>Ticket Ausgabe</h1>
@@ -156,5 +157,6 @@ export default function PurchaseForm() {
         <input type="button" value="Zurück" onClick={() => (window.location = "./staff")} />
       </form>
     </div>
+    </body>
   );
 }
