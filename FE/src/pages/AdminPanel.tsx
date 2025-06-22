@@ -17,7 +17,9 @@ const AdminPanel = () => {
 
   const handleImportantSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!token) {
+    // Always get the latest token from localStorage
+    const currentToken = localStorage.getItem('token');
+    if (!currentToken) {
       toast.error('Nicht eingeloggt.');
       return;
     }
@@ -34,7 +36,7 @@ const AdminPanel = () => {
       const res = await fetch('/api/news/sub_hot', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${currentToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ hot_news }),
@@ -58,7 +60,9 @@ const AdminPanel = () => {
 
   const handleNewsSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!token) {
+    // Always get the latest token from localStorage
+    const currentToken = localStorage.getItem('token');
+    if (!currentToken) {
       toast.error('Nicht eingeloggt.');
       return;
     }
@@ -81,7 +85,7 @@ const AdminPanel = () => {
       const res = await fetch('/api/news/sub_all', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${currentToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ title, text }),

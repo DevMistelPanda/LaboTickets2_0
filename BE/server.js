@@ -69,6 +69,17 @@ async function testDatabaseConnection() {
   }
 }
 
+// --- Require authentication for all /api/* except /api/login ---
+app.use((req, res, next) => {
+  if (
+    req.path.startsWith('/api/') &&
+    req.path !== '/api/login'
+  ) {
+    return authenticateToken(req, res, next);
+  }
+  next();
+});
+
 // --- Routes ---
 
 // Login route (public)

@@ -30,22 +30,25 @@ const StatsDashboard = () => {
   const [salesPerUser, setSalesPerUser] = useState<{ username: string; sold: number }[]>([]);
 
   useEffect(() => {
-    fetch('/api/stats/sales-over-time')
+    const token = localStorage.getItem("token");
+    const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+
+    fetch('/api/stats/sales-over-time', { headers: authHeaders })
       .then(res => res.json())
       .then(setSalesOverTime);
 
-    fetch('/api/stats/sales-per-class')
+    fetch('/api/stats/sales-per-class', { headers: authHeaders })
       .then(res => res.json())
       .then(setSalesPerClass);
 
-    fetch('/api/stats/entered-over-time')
+    fetch('/api/stats/entered-over-time', { headers: authHeaders })
       .then(res => res.json())
       .then(data => {
         // Filter out entries where hour is "NULL"
         setEnteredOverTime(data.filter((d: { hour: string }) => d.hour !== "NULL"));
       });
 
-    fetch('/api/stats/sales-per-user')
+    fetch('/api/stats/sales-per-user', { headers: authHeaders })
       .then(res => res.json())
       .then(setSalesPerUser);
   }, []);

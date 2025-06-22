@@ -23,7 +23,12 @@ const StaffPanel = () => {
 
   const fetchVisitorStats = async () => {
     try {
-      const res = await fetch('/api/visitors/stats');
+      const token = localStorage.getItem("token");
+      const res = await fetch('/api/visitors/stats', {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const [data]: [VisitorStats] = await res.json(); 
       setVisStats(data);
     } catch (err) {
@@ -34,7 +39,12 @@ const StaffPanel = () => {
 
   const fetchHotNews = async () => {
     try {
-      const res = await fetch('/api/news/hot'); // note: use http, not https
+      const token = localStorage.getItem("token");
+      const res = await fetch('/api/news/hot', {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const data = await res.json(); // data is an array of objects
 
       if (data.length > 0) {
@@ -50,7 +60,12 @@ const StaffPanel = () => {
 
   const fetchNewsList = async () => {
     try {
-      const res = await fetch('/api/news');
+      const token = localStorage.getItem("token");
+      const res = await fetch('/api/news', {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const data = await res.json();
 
       setNewsList(data.reverse());
