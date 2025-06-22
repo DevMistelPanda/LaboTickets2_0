@@ -113,7 +113,7 @@ const StatsDashboard = () => {
               {
                 label: 'Eintritte',
                 data: enteredOverTime.map(d => d.entered),
-                backgroundColor: '#10b981',
+                backgroundColor: '#7c3aed',
               },
             ],
           }}
