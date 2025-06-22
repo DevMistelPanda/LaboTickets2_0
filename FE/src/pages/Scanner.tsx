@@ -2,69 +2,40 @@
 import React, { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
 
+type ScanResult = {
+  status: "success" | "fail";
+  html: string;
+};
+
 export default function Scanner() {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const frameRef = useRef<number | null>(null);
 
-  // wir speichern Stream und Frame-ID, um mehrfach starten/stoppen zu können
-  const streamRef = useRef(null);
-  const frameRef = useRef(null);
-
-  // Klassendaten
-  const [klasse, setKlasse] = useState("");
-  const [loadingClass, setLoadingClass] = useState(true);
-  const [classError, setClassError] = useState("");
-
-  // Scan + Input
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const [popupHtml, setPopupHtml] = useState<string | null>(null);
+  const [popupColor, setPopupColor] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Popup: confirm | accept | reject
-  const [popup, setPopup] = useState({
-    visible: false,
-    type: "",
-    color: "",
-    name: "",
-    nameShort: "",
-    klasse: "",
-    code: "",
-    message: "",
-  });
-
-  // Hilfs-Funktion für Kurzname
-  const makeShortName = (fullName) =>
-    fullName
-      .trim()
-      .split(" ")
-      .map((w) => w.slice(0, 2))
-      .join(" ");
-
-  // 1) Klasse laden
-  useEffect(() => {
-    fetch("/api/user/klasse")
-      .then((res) => res.json())
-      .then((data) => setKlasse(data.klasse))
-      .catch(() => setClassError("Fehler beim Laden der Klasse"))
-      .finally(() => setLoadingClass(false));
-  }, []);
-
-  // 2) Scanner starten / neu starten
-  const startScanner = () => {
-    // alte Kamera/Loop stoppen
+  // Start/stop camera and scan loop
+  const stopScanner = () => {
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     }
+  };
 
-    // reset UI
+  const startScanner = () => {
+    stopScanner();
     setError("");
     setCode("");
-
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
     const ctx = canvas.getContext("2d");
-
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: "environment" } })
       .then((stream) => {
@@ -72,33 +43,21 @@ export default function Scanner() {
         video.srcObject = stream;
         video.setAttribute("playsinline", "true");
         video.play();
-
         const scan = () => {
-          if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          if (video.readyState === 4) {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = ctx.getImageData(
-              0,
-              0,
-              canvas.width,
-              canvas.height
-            );
-            const qr = jsQR(
-              imageData.data,
-              imageData.width,
-              imageData.height
-            );
+            const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const qr = jsQR(img.data, img.width, img.height);
             if (qr) {
               setCode(qr.data);
-              cancelAnimationFrame(frameRef.current);
-              streamRef.current.getTracks().forEach((t) => t.stop());
+              stopScanner();
               return;
             }
           }
           frameRef.current = requestAnimationFrame(scan);
         };
-
         scan();
       })
       .catch(() => setError("Kamera nicht verfügbar"));
@@ -106,246 +65,106 @@ export default function Scanner() {
 
   useEffect(() => {
     startScanner();
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-      }
-    };
+    return stopScanner;
+    // eslint-disable-next-line
   }, []);
 
-  // 3) Ticket-Code validieren
-  const hexToDecimal = (hex) => parseInt(hex, 16);
-  const validateTicketCode = (c) => {
-    if (c.length !== 13) return false;
-    const first4 = c.slice(0, 4);
-    const last5 = c.slice(-5);
-    return hexToDecimal(first4) + hexToDecimal(last5) === 468529;
-  };
-
-  // 4a) Erster Klick: Check → Confirm-Dialog
-  const handleCheck = (e) => {
+  // Submit code to backend /scanner endpoint
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setPopup({ visible: false, type: "" });
+    setPopupHtml(null);
+    setPopupColor(null);
 
-    if (!code.trim()) {
+    const ticketCode = code.trim();
+    if (!ticketCode) {
       setError("Bitte Ticket-Code eingeben oder scannen");
       return;
     }
-    if (!validateTicketCode(code.trim())) {
-      setPopup({
-        visible: true,
-        type: "reject",
-        color: "blue",
-        message: "Nicht gültig / schon auf dem Ball",
-      });
-      return;
-    }
 
-    let parsed;
+    setLoading(true);
     try {
-      parsed = JSON.parse(code);
-    } catch {
-      setPopup({
-        visible: true,
-        type: "reject",
-        color: "blue",
-        message: "Ungültiger QR-Inhalt",
-      });
-      return;
-    }
-
-    const { name, klasse: cls, code: c } = parsed;
-    if (!name || !cls || !c) {
-      setPopup({
-        visible: true,
-        type: "reject",
-        color: "blue",
-        message: "Ungültiger QR-Inhalt",
-      });
-      return;
-    }
-
-    setPopup({
-      visible: true,
-      type: "confirm",
-      color: "gray",
-      name,
-      nameShort: makeShortName(name),
-      klasse: cls,
-      code: c,
-    });
-  };
-
-  // 4b) Confirm gedrückt → API-Call
-  const handleConfirm = async () => {
-    const { name, klasse: cls, code: c } = popup;
-
-    try {
-      const res = await fetch("/api/visitors/enter", {
+      const res = await fetch("/api/scanner", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, klasse: cls, code: c }),
+        body: JSON.stringify({ code: ticketCode }),
       });
 
-      // 503 ignorieren → Scanner neu starten
-      if (res.status === 503) {
-        setPopup({ visible: false, type: "" });
-        startScanner();
-        return;
-      }
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setPopup({
-          visible: true,
-          type: "reject",
-          color: "blue",
-          message: data.message || "Fehler beim Eintragen",
-        });
-        return;
-      }
-
-      // Erfolg
-      const num = parseInt(cls, 10);
-      const col = num >= 9 ? "green" : "red";
-      setPopup({
-        visible: true,
-        type: "accept",
-        color: col,
-        nameShort: makeShortName(name),
-        klasse: cls,
-        code: c,
-      });
-    } catch {
-      setPopup({
-        visible: true,
-        type: "reject",
-        color: "blue",
-        message: "Netzwerkfehler – bitte erneut versuchen",
-      });
+      // Always expect JSON
+      const data = await res.json();
+      setPopupHtml(data.html);
+      setPopupColor(data.color || null);
+      setLoading(false);
+      stopScanner();
+    } catch (err) {
+      setError("Fehler beim Prüfen des Tickets.");
+      setLoading(false);
     }
   };
 
-  // Popup schließen & Scanner neu starten
-  const closePopup = () => {
-    setPopup({ visible: false, type: "" });
+  // Close popup and restart scanner
+  const handleClosePopup = () => {
+    setPopupHtml(null);
+    setPopupColor(null);
+    setCode("");
+    setError("");
     startScanner();
   };
 
-  // 5) Lade- und Error-Zustände
-  if (loadingClass) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Lade Klassendaten…</p>
-      </div>
-    );
-  }
-  if (classError) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500">{classError}</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      {/* POPUP */}
-      {popup.visible && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
+      {/* POPUP HTML from backend */}
+      {popupHtml && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
           <div
-            className={`bg-white rounded-lg shadow-xl p-8 w-full max-w-md text-center space-y-4
-              ${
-                popup.type === "accept"
-                  ? `border-2 border-${popup.color}-600`
-                  : popup.type === "reject"
-                  ? "border-2 border-blue-600"
-                  : "border-2 border-gray-600"
-              }`}
+            className={`bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg text-center space-y-4 relative border-4 ${
+              popupColor === "green"
+                ? "border-green-500"
+                : popupColor === "red"
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
           >
-            {popup.type === "confirm" && (
-              <>
-                <h3 className="text-xl font-bold text-gray-700 mb-4">
-                  Bitte bestätigen
-                </h3>
-                <p>
-                  {popup.nameShort} – Klasse {popup.klasse}
-                </p>
-                <p className="font-mono">{popup.code}</p>
-                <div className="flex mt-6 space-x-4">
-                  <button
-                    onClick={handleConfirm}
-                    className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
-                  >
-                    Bestätigen
-                  </button>
-                  <button
-                    onClick={closePopup}
-                    className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
-                  >
-                    Abbrechen
-                  </button>
-                </div>
-              </>
-            )}
-
-            {popup.type === "accept" && (
-              <>
-                <h3
-                  className={`text-2xl font-bold mb-2 text-${popup.color}-700`}
-                >
-                  Einlass erlaubt
-                </h3>
-                <p>Klasse: {popup.klasse}</p>
-                <p className="font-mono">{popup.code}</p>
-                <p>Name: {popup.nameShort}</p>
-                <button
-                  onClick={closePopup}
-                  className="w-full bg-party-purple text-white py-3 rounded-lg hover:bg-purple-700 mt-4"
-                >
-                  Nächster
-                </button>
-              </>
-            )}
-
-            {popup.type === "reject" && (
-              <>
-                <h3 className="text-xl font-bold text-blue-700">
-                  {popup.message}
-                </h3>
-                <button
-                  onClick={closePopup}
-                  className="w-full bg-party-purple text-white py-3 rounded-lg hover:bg-purple-700 mt-4"
-                >
-                  Nächster
-                </button>
-              </>
-            )}
+            <button
+              onClick={handleClosePopup}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl"
+              aria-label="Schließen"
+            >
+              &times;
+            </button>
+            <div
+              dangerouslySetInnerHTML={{ __html: popupHtml }}
+              style={{ minWidth: 300 }}
+            />
+            <button
+              onClick={handleClosePopup}
+              className="w-full bg-party-purple text-white py-3 rounded-xl font-semibold hover:bg-purple-700 mt-4 transition"
+            >
+              Nächster
+            </button>
           </div>
         </div>
       )}
 
-      {/* HAUPTSEITE */}
+      {/* MAIN */}
       <div className="relative w-full h-screen">
+        {/* Hintergrundbild */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg')",
+              "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')",
             filter: "brightness(0.6)",
             zIndex: 0,
           }}
         />
-
         <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
           <form
-            onSubmit={handleCheck}
-            className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md space-y-6"
+            onSubmit={handleSubmit}
+            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md space-y-7 flex flex-col items-center"
           >
-            <h2 className="text-2xl font-bold text-center text-gray-800">
-              Ticket Scanning
+            <h2 className="text-3xl font-extrabold text-party-purple mb-2 text-center">
+              Ticket Scannen
             </h2>
             {error && (
               <p className="text-red-500 text-sm text-center">{error}</p>
@@ -355,26 +174,30 @@ export default function Scanner() {
               placeholder="Ticket-Code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg"
+              className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-party-purple focus:outline-none text-lg"
+              autoFocus
             />
             <button
               type="submit"
-              className="w-full bg-party-purple text-white py-3 rounded-lg hover:bg-purple-700"
+              className="w-full bg-party-purple text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition"
+              disabled={loading}
             >
-              Prüfen
+              {loading ? "Prüfe..." : "Prüfen"}
             </button>
             <button
               type="button"
               onClick={() => (window.location.href = "/staff")}
-              className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400"
+              className="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition"
             >
               Zurück
             </button>
-            <video ref={videoRef} className="hidden" />
-            <canvas
-              ref={canvasRef}
-              className="w-full h-80 border border-gray-300 rounded-lg mt-4"
-            />
+            <div className="w-full flex flex-col items-center mt-2">
+              <video ref={videoRef} className="hidden" />
+              <canvas
+                ref={canvasRef}
+                className="w-full h-64 border border-gray-200 rounded-xl mt-2 bg-gray-100"
+              />
+            </div>
           </form>
         </div>
       </div>
