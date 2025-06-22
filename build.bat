@@ -1,5 +1,11 @@
 @echo off
 setlocal EnableDelayedExpansion
+:: Step 0: check for -dev flag
+set "DEV_MODE=0"
+if /I "%~1"=="-dev" (
+    set "DEV_MODE=1"
+    echo Running in development mode. .env will be included and server will start after build.
+)
 
 :: Step 1: Build Frontend
 pushd FE
@@ -12,31 +18,12 @@ if errorlevel 1 (
 )
 popd
 
-:: Step 2: Determine build version
-set "BUILD_DIR_PREFIX=build"
-set "CUSTOM_VERSION=%~1"
+:: Step 2: Set build directory and check for -dev flag
+set "BUILD_DIR=build"
 
-if defined CUSTOM_VERSION (
-    set "BUILD_DIR=%BUILD_DIR_PREFIX%%CUSTOM_VERSION%"
-) else (
-    set "HIGHEST=0"
-    for /D %%D in (%BUILD_DIR_PREFIX%*) do (
-        set "DIR=%%~nxD"
-        for /f "tokens=2 delims=build" %%V in ("!DIR!") do (
-            set "VER=%%V"
-            set "VER=!VER:.=!"
-            set /a VAL=1!VER! - 1000000
-            if !VAL! gtr !HIGHEST! set "HIGHEST=!VAL!"
-        )
-    )
-    set /a NEXTVAL=HIGHEST + 1
-    set "V1=1"
-    set /a V2=0
-    set /a V3=NEXTVAL
-    set "BUILD_DIR=%BUILD_DIR_PREFIX%%V1%_0_!V3!"
-)
 
 echo Creating build directory: %BUILD_DIR%
+rmdir /s /q "%BUILD_DIR%" >nul 2>&1
 mkdir "%BUILD_DIR%"
 
 :: Step 3: Copy FE build
@@ -48,11 +35,15 @@ echo Cleaned up FE dist directory.
 :: Step 4: Copy BE contents (excluding .env and node_modules)
 echo Copying BE files and folders...
 
-:: Copy BE root files (excluding .env)
+:: Copy BE root files (excluding .env unless -dev)
 for %%F in (BE\*) do (
-    if not "%%~nxF"==".env" (
-        if not exist "%%F\nul" (
-            copy "%%F" "%BUILD_DIR%\%%~nxF" >nul
+    if "!DEV_MODE!"=="1" (
+        copy "%%F" "%BUILD_DIR%\%%~nxF" >nul
+    ) else (
+        if not "%%~nxF"==".env" (
+            if not exist "%%F\nul" (
+                copy "%%F" "%BUILD_DIR%\%%~nxF" >nul
+            )
         )
     )
 )
@@ -64,9 +55,45 @@ for /D %%D in (BE\*) do (
     )
 )
 
+:: If -dev, ensure .env is copied (in case it was missed above)
+if "!DEV_MODE!"=="1" (
+    if exist "BE\.env" (
+        copy "BE\.env" "%BUILD_DIR%\.env" >nul
+    )
+)
+
 echo Build complete: %BUILD_DIR%
 cd "%BUILD_DIR%"
 echo installing dependencies...
 call npm install
+
+:: If -dev, run node server.js
+if "!DEV_MODE!"=="1" (
+    echo Running node server.js in dev mode...
+    node server.js
+)
+
+endlocal
+pause
+)
+
+:: If -dev, ensure .env is copied (in case it was missed above)
+if "!DEV_MODE!"=="1" (
+    if exist "BE\.env" (
+        copy "BE\.env" "%BUILD_DIR%\.env" >nul
+    )
+)
+
+echo Build complete: %BUILD_DIR%
+cd "%BUILD_DIR%"
+echo installing dependencies...
+call npm install
+
+:: If -dev, run node server.js
+if "!DEV_MODE!"=="1" (
+    echo Running node server.js in dev mode...
+    node server.js
+)
+
 endlocal
 pause
