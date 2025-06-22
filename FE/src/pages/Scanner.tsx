@@ -1,88 +1,118 @@
-// PurchaseForm.jsx
+// Scanner.jsx
 import React, { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
 
-function PopupBox({ confirmedName, confirmedKlasse, confirmedCode, onClose }) {
-  return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full space-y-4 text-center">
-        <h3 className="text-2xl font-bold text-green-600">Verkauf erfolgreich!</h3>
-        <p className="text-gray-800">
-          Verkauf erfolgreich an{" "}
-          <span className="font-semibold">{confirmedName}</span>, Klasse{" "}
-          <span className="font-semibold">{confirmedKlasse}</span>, Ticketcode:{" "}
-          <span className="font-mono">{confirmedCode}</span>
-        </p>
-        <button
-          onClick={onClose}
-          className="mt-4 bg-party-purple text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 transition"
-        >
-          Schließen
-        </button>
-      </div>
-    </div>
-  );
-}
-
-export default function PurchaseForm() {
-  const canvasRef = useRef(null);
+export default function Scanner() {
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+  const frameRef = useRef(null);
 
-  const [name, setName] = useState("");
   const [klasse, setKlasse] = useState("");
+  const [loadingClass, setLoadingClass] = useState(true);
+  const [classError, setClassError] = useState("");
+
   const [code, setCode] = useState("");
-  const [errors, setErrors] = useState({});
-  const [scannerVisible, setScannerVisible] = useState(false);
+  const [error, setError] = useState("");
 
-  // confirmation overlay state
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [confirmedName, setConfirmedName] = useState("");
-  const [confirmedKlasse, setConfirmedKlasse] = useState("");
-  const [confirmedCode, setConfirmedCode] = useState("");
+  // popup.type: "confirm" | "accept" | "reject"
+  const [popup, setPopup] = useState({
+    visible: false,
+    type: "",
+    color: "",
+    name: "",
+    nameShort: "",
+    klasse: "",
+    code: "",
+    message: "",
+  });
 
+  // Helper: "Vorname Nachname" → "Vo Na"
+  const makeShortName = (fullName) =>
+    fullName
+      .trim()
+      .split(" ")
+      .map((w) => w.slice(0, 2))
+      .join(" ");
+
+  // 1) Klasse vom Backend laden
   useEffect(() => {
-    if (!scannerVisible) return;
+    fetch("/api/user/klasse")
+      .then((res) => res.json())
+      .then((data) => setKlasse(data.klasse))
+      .catch(() => setClassError("Fehler beim Laden der Klasse"))
+      .finally(() => setLoadingClass(false));
+  }, []);
+
+  // 2) Scanner starten / neu starten
+  const startScanner = () => {
+    // Cleanup alter Instanzen
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+    }
+
+    setError("");
+    setCode("");
+
+    const constraints = { video: { facingMode: "environment" } };
     const video = videoRef.current;
     const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
     const ctx = canvas.getContext("2d");
-    let animationId;
 
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: "environment" } })
+      .getUserMedia(constraints)
       .then((stream) => {
+        streamRef.current = stream;
         video.srcObject = stream;
-        video.setAttribute("playsinline", true);
+        video.setAttribute("playsinline", "true");
         video.play();
 
-        const tick = () => {
+        const scan = () => {
           if (video.readyState === video.HAVE_ENOUGH_DATA) {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const qr = jsQR(imageData.data, imageData.width, imageData.height);
+            const imageData = ctx.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height
+            );
+            const qr = jsQR(
+              imageData.data,
+              imageData.width,
+              imageData.height
+            );
             if (qr) {
               setCode(qr.data);
-              stopScanner();
+              cancelAnimationFrame(frameRef.current);
+              streamRef.current.getTracks().forEach((t) => t.stop());
+              return;
             }
           }
-          animationId = requestAnimationFrame(tick);
+          frameRef.current = requestAnimationFrame(scan);
         };
-        tick();
+
+        scan();
       })
-      .catch(() => {
-        stopScanner();
-      });
-
-    return () => stopScanner();
-  }, [scannerVisible]);
-
-  const stopScanner = () => {
-    const tracks = videoRef.current?.srcObject?.getTracks();
-    tracks?.forEach((t) => t.stop());
-    setScannerVisible(false);
+      .catch(() => setError("Kamera nicht verfügbar"));
   };
 
+  // Scanner beim Mount starten
+  useEffect(() => {
+    startScanner();
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+    };
+  }, []);
+
+  // 3) Validierung
   const hexToDecimal = (hex) => parseInt(hex, 16);
   const validateTicketCode = (c) => {
     if (c.length !== 13) return false;
@@ -91,99 +121,233 @@ export default function PurchaseForm() {
     return hexToDecimal(first4) + hexToDecimal(last5) === 468529;
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!name.trim()) {
-      newErrors.name = "Bitte Namen eingeben";
-    } else if (name.trim().split(" ").length < 2) {
-      newErrors.name = "Bitte Vor- und Nachnamen eingeben";
-    }
-
-    if (!klasse.trim()) {
-      newErrors.klasse = "Bitte Klasse eingeben";
-    } else if (
-      !/^(5[abcd]|6[abcd]|7[abcd]|8[abcd]|9[abcd]|10[abcd]|11[abcd]|12|13)$/i.test(klasse)
-    ) {
-      newErrors.klasse = "Diese Klasse existiert nicht :P";
-    }
+  // 4a) Beim Klicken auf "Prüfen": vorläufig validieren und Confirm-Popup öffnen
+  const handleCheck = (e) => {
+    e.preventDefault();
+    setError("");
+    setPopup({ visible: false, type: "", message: "" });
 
     if (!code.trim()) {
-      newErrors.code = "Bitte Ticket-Code eingeben";
-    } else if (!validateTicketCode(code.trim())) {
-      newErrors.code = "Der Ticket-Code ist nicht valide";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    // Kurze Form des Namens: jeweils erste 2 Buchstaben
-    const shortName = name
-      .trim()
-      .split(" ")
-      .map((part) => part.slice(0, 2))
-      .join(" ");
-
-    try {
-      const response = await fetch("/api/visitors/purchase", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          klasse: klasse.trim(),
-          code: code.trim()
-        })
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        setErrors({ code: data?.message || "Fehler beim Eintragen" });
-        return;
-      }
-    } catch (err) {
-      setErrors({ code: "Serverfehler beim Eintragen" });
+      setError("Bitte Ticket-Code eingeben oder scannen");
       return;
     }
+    if (!validateTicketCode(code.trim())) {
+      return setPopup({
+        visible: true,
+        type: "reject",
+        color: "blue",
+        message: "Nicht gültig / schon auf dem Ball",
+      });
+    }
 
-    // Zustände aktualisieren und Popup anzeigen
-    setConfirmedName(shortName);
-    setConfirmedKlasse(klasse.trim());
-    setConfirmedCode(code.trim());
-    setShowConfirmation(true);
+    let parsed;
+    try {
+      parsed = JSON.parse(code);
+    } catch {
+      return setPopup({
+        visible: true,
+        type: "reject",
+        color: "blue",
+        message: "Ungültiger QR-Inhalt",
+      });
+    }
+
+    if (!parsed.name || !parsed.klasse || !parsed.code) {
+      return setPopup({
+        visible: true,
+        type: "reject",
+        color: "blue",
+        message: "Ungültiger QR-Inhalt",
+      });
+    }
+
+    // Confirm-Popup anzeigen
+    setPopup({
+      visible: true,
+      type: "confirm",
+      color: "gray",
+      name: parsed.name,
+      nameShort: makeShortName(parsed.name),
+      klasse: parsed.klasse,
+      code: parsed.code,
+      message: "",
+    });
   };
 
-  // Bei Schließen des Popups die Eingabefelder zurücksetzen
-  const handleClosePopup = () => {
-    setShowConfirmation(false);
-    setName("");
-    setKlasse("");
-    setCode("");
-    setErrors({});
+  // 4b) Nach Bestätigung: tatsächlicher API-Call
+  const handleConfirm = async () => {
+    const { name, klasse, code } = popup;
+
+    try {
+      const res = await fetch("/api/visitors/enter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, klasse, code }),
+      });
+
+      // 503 ignorieren und Scanner neu starten
+      if (res.status === 503) {
+        setPopup({ visible: false, type: "" });
+        startScanner();
+        return;
+      }
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        setPopup({
+          visible: true,
+          type: "reject",
+          color: "blue",
+          message: payload.message || "Fehler beim Eintragen",
+        });
+        return;
+      }
+
+      // Erfolg
+      const num = parseInt(klasse, 10);
+      const color = num >= 9 ? "green" : "red";
+      setPopup({
+        visible: true,
+        type: "accept",
+        color,
+        nameShort: makeShortName(name),
+        klasse,
+        code,
+        message: "",
+      });
+    } catch {
+      setPopup({
+        visible: true,
+        type: "reject",
+        color: "blue",
+        message: "Netzwerkfehler – bitte erneut versuchen",
+      });
+    }
   };
+
+  // Popup schließen & Scanner neu starten
+  const closePopup = () => {
+    setPopup({ visible: false, type: "" });
+    startScanner();
+  };
+
+  // 5) Loading & Error States für Klassendaten
+  if (loadingClass) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Lade Klassendaten…</p>
+      </div>
+    );
+  }
+  if (classError) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-red-500">{classError}</p>
+      </div>
+    );
+  }
 
   return (
     <>
-      {showConfirmation && (
-        <PopupBox
-          confirmedName={confirmedName}
-          confirmedKlasse={confirmedKlasse}
-          confirmedCode={confirmedCode}
-          onClose={handleClosePopup}
-        />
+      {/* FULLSCREEN POPUP */}
+      {popup.visible && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div
+            className={`bg-white rounded-lg shadow-xl p-8 w-full max-w-md text-center space-y-4
+              ${
+                popup.type === "accept"
+                  ? popup.color === "green"
+                    ? "border-2 border-green-600"
+                    : "border-2 border-red-600"
+                  : popup.type === "reject"
+                  ? "border-2 border-blue-600"
+                  : "border-2 border-gray-600"
+              }`}
+          >
+            {popup.type === "confirm" && (
+              <>
+                <h3 className="text-xl font-bold text-gray-700 mb-4">
+                  Bitte bestätigen
+                </h3>
+                <p className="text-gray-800">
+                  Name: <span className="font-semibold">{popup.nameShort}</span>
+                </p>
+                <p className="text-gray-800">
+                  Klasse: <span className="font-semibold">{popup.klasse}</span>
+                </p>
+                <p className="text-gray-800">
+                  Code: <span className="font-mono">{popup.code}</span>
+                </p>
+                <div className="flex space-x-4 mt-6">
+                  <button
+                    onClick={handleConfirm}
+                    className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+                  >
+                    Bestätigen
+                  </button>
+                  <button
+                    onClick={closePopup}
+                    className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
+                  >
+                    Abbrechen
+                  </button>
+                </div>
+              </>
+            )}
+
+            {popup.type === "accept" && (
+              <>
+                <h3
+                  className={`text-2xl font-bold mb-2 ${
+                    popup.color === "green"
+                      ? "text-green-700"
+                      : "text-red-700"
+                  }`}
+                >
+                  Einlass erlaubt
+                </h3>
+                <p className="text-gray-800">
+                  Klasse: <span className="font-semibold">{popup.klasse}</span>
+                </p>
+                <p className="text-gray-800">
+                  Code: <span className="font-mono">{popup.code}</span>
+                </p>
+                <p className="text-gray-800">
+                  Name: <span className="font-semibold">{popup.nameShort}</span>
+                </p>
+                <button
+                  onClick={closePopup}
+                  className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition mt-4"
+                >
+                  Nächster
+                </button>
+              </>
+            )}
+
+            {popup.type === "reject" && (
+              <>
+                <h3 className="text-xl font-bold text-blue-700">
+                  {popup.message}
+                </h3>
+                <button
+                  onClick={closePopup}
+                  className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition mt-4"
+                >
+                  Nächster
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       )}
 
+      {/* MAIN LAYOUT */}
       <div className="relative w-full h-screen">
-        {/* Hintergrundbild */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')",
+              "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg')",
             filter: "brightness(0.6)",
             zIndex: 0,
           }}
@@ -191,66 +355,33 @@ export default function PurchaseForm() {
 
         <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
           <form
-            onSubmit={handleSubmit}
+            id="scanner"
+            onSubmit={handleCheck}
             className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md space-y-6"
           >
             <h2 className="text-2xl font-bold text-center text-gray-800">
-              Ticket Ausgabe
+              Ticket Scanning
             </h2>
 
-            {(errors.name || errors.klasse || errors.code) && (
-              <div className="text-red-500 text-sm text-center">
-                {errors.name || errors.klasse || errors.code}
-              </div>
+            {error && (
+              <p className="text-red-500 text-sm text-center">{error}</p>
             )}
 
             <input
+              id="code"
+              name="code"
               type="text"
-              placeholder="Vor- und Nachname"
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-
-            <input
-              type="text"
-              placeholder="Klasse"
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              value={klasse}
-              onChange={(e) => setKlasse(e.target.value)}
-            />
-
-            <input
-              type="text"
-              placeholder="Ticket-Code scannen oder eingeben"
-              className="w-full p-3 border border-gray-300 rounded-lg"
+              placeholder="Ticket-Code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg"
             />
-
-            <button
-              type="button"
-              onClick={() => setScannerVisible(true)}
-              className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition"
-            >
-              QR Code Scanner
-            </button>
-
-            {scannerVisible && (
-              <>
-                <video ref={videoRef} className="hidden" />
-                <canvas
-                  ref={canvasRef}
-                  className="w-full h-80 border border-gray-300 rounded-lg mt-4"
-                />
-              </>
-            )}
 
             <button
               type="submit"
               className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition"
             >
-              Ausgeben
+              Prüfen
             </button>
 
             <button
@@ -260,6 +391,12 @@ export default function PurchaseForm() {
             >
               Zurück
             </button>
+
+            <video ref={videoRef} className="hidden" />
+            <canvas
+              ref={canvasRef}
+              className="w-full h-80 border border-gray-300 rounded-lg mt-4"
+            />
           </form>
         </div>
       </div>
