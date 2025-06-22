@@ -124,6 +124,8 @@ export default function PurchaseForm() {
     const nn = split_name[1].substring(0, 2)
     const shortName = vn + " " + nn;
 
+    const id = code.substring(4, 8);
+
     // Backend-Request: Besucher in DB eintragen
     try {
       const response = await fetch("/api/visitors/purchase", {
@@ -133,10 +135,11 @@ export default function PurchaseForm() {
           "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
         },
         body: JSON.stringify({
-          name: name.trim(),
+          name: shortName.trim(),
           klasse: klasse.trim(),
           code: code.trim(),
-          user: getUsernameFromToken()
+          user: getUsernameFromToken(),
+          id // <-- send id to backend
         })
       });
       if (!response.ok) {
@@ -152,7 +155,7 @@ export default function PurchaseForm() {
     setConfirmedName(shortName);
     setConfirmedKlasse(klasse.trim());
     setConfirmedCode(code.trim());
-    setConfirmedID(code.substring(4, 8));
+    setConfirmedID(id);
     setShowConfirmation(true);
   };
 

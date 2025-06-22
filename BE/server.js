@@ -541,7 +541,7 @@ app.post('/api/visitors/enter', async (req, res) => {
 
 // Besucher beim Ticketverkauf in DB eintragen
 app.post('/api/visitors/purchase', async (req, res) => {
-  const { name, klasse, code, user } = req.body;
+  const { name, klasse, code, user, id } = req.body;
   if (!name || !klasse || !code) {
     return res.status(400).json({ message: 'Name, Klasse und Code erforderlich' });
   }
@@ -554,10 +554,15 @@ app.post('/api/visitors/purchase', async (req, res) => {
     if (rows.length > 0) {
       return res.status(409).json({ message: 'Ticket-Code existiert bereits' });
     }
+
+    // Ermittle höchste number und erhöhe um 1
+    const [maxRows] = await pool.query('SELECT MAX(number) AS maxNumber FROM besucher');
+    const nextNumber = (maxRows[0].maxNumber || 0) + 1;
+
     // Eintragen
     await pool.execute(
-      'INSERT INTO besucher (name, class, ticket, entered, vdate, user) VALUES (?, ?, ?, 0, ?, ?)',
-      [name, klasse, code, new Date().toLocaleString('en-GB', { hour12: false }), user]
+      'INSERT INTO besucher (name, class, ticket, entered, vdate, user, id, number) VALUES (?, ?, ?, 0, ?, ?, ?, ?)',
+      [name, klasse, code, new Date().toLocaleString('en-GB', { hour12: false }), user, id, nextNumber]
     );
     res.json({ message: 'Ticket erfolgreich verkauft' });
   } catch (err) {
