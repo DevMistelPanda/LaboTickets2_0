@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Header from '@/components/StaffHeader';
 import { toast, Toaster } from 'sonner';
+import StatsDashboard from '@/components/StatsDashboard';
 
 const AdminPanel = () => {
   const [username, setUsername] = useState('...');
@@ -173,6 +174,10 @@ const AdminPanel = () => {
           </div>
         </div>
       </section>
+      {/* Add StatsDashboard below the forms */}
+        <div className="relative z-10 w-full">
+          <StatsDashboard />
+        </div>
     </>
   );
 };

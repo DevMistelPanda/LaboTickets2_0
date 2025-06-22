@@ -251,6 +251,46 @@ app.post('/api/news/sub_pub', authenticateToken, async (req, res) => {
   }
 });
 
+// Tickets sold over time (by day)
+app.get('/api/stats/sales-over-time', async (req, res) => {
+  try {
+    // Parse vdate (VARCHAR) as date using STR_TO_DATE
+    const [results] = await pool.query(`
+      SELECT 
+        DATE(STR_TO_DATE(vdate, '%d/%m/%Y')) AS date, 
+        COUNT(*) AS sold
+      FROM besucher
+      WHERE vdate IS NOT NULL AND vdate != ''
+      GROUP BY DATE(STR_TO_DATE(vdate, '%d/%m/%Y'))
+      ORDER BY DATE(STR_TO_DATE(vdate, '%d/%m/%Y'))
+    `);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Verkaufsdaten' });
+  }
+});
+
+// Tickets sold per class (numbers only)
+app.get('/api/stats/sales-per-class', async (req, res) => {
+  try {
+    // Adjust column name as needed (e.g., 'class')
+    const [results] = await pool.query(`
+      SELECT 
+        REGEXP_REPLACE(class, '[^0-9]', '') AS class_number,
+        COUNT(*) AS sold
+      FROM besucher
+      WHERE class IS NOT NULL AND class != ''
+      GROUP BY class_number
+      ORDER BY class_number
+    `);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Fehler beim Abrufen der klassendaten' });
+  }
+});
+
 // 🔹 Static file serving (frontend)
 app.use(express.static(path.join(__dirname, 'dist')));
 
