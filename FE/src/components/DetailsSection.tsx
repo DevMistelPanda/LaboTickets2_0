@@ -9,7 +9,7 @@ const DetailsSection = () => {
     {
       icon: <Calendar size={28} className="text-party-purple" />,
       title: "Datum",
-      info: "Samstag, Juli 15, 2025"
+      info: "Freitag, Juli 25, 2025"
     },
     {
       icon: <Clock size={28} className="text-party-purple" />,
