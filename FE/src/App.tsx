@@ -24,12 +24,12 @@ const App = () => (
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/login" element={<LoginPage />} />
-
+      <Route path="/scanner" element={<Scanner />}/>
+        <Route path="/purcase" element={<Purcase />}/>
       {/* Staff protected route (any logged-in user) */}
       <Route element={<ProtectedRoute />}>
         <Route path="/staff" element={<StaffPanel />} />
-        <Route path="/scanner" element={<Scanner />}/>
-        <Route path="/purcase" element={<Purcase />}/>
+        
       </Route>
 
       {/* Admin only route */}

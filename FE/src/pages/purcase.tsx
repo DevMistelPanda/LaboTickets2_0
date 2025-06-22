@@ -1,7 +1,6 @@
 // PurchaseForm.jsx
 import React, { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
-import "./purchase.css";
 
 export default function PurchaseForm() {
   const canvasRef = useRef(null);
@@ -13,12 +12,16 @@ export default function PurchaseForm() {
   const [errors, setErrors] = useState({});
   const [scannerVisible, setScannerVisible] = useState(false);
 
+  // state to hold and show the JSON payload
+  const [payload, setPayload] = useState(null);
+  const [showPayload, setShowPayload] = useState(false);
+
   useEffect(() => {
     if (!scannerVisible) return;
-
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+    let animationId;
 
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: "environment" } })
@@ -32,17 +35,24 @@ export default function PurchaseForm() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
-            if (qrCode) {
-              setCode(qrCode.data);
+            const imageData = ctx.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height
+            );
+            const qr = jsQR(imageData.data, imageData.width, imageData.height);
+            if (qr) {
+              setCode(qr.data);
               stopScanner();
             }
           }
-          requestAnimationFrame(tick);
+          animationId = requestAnimationFrame(tick);
         };
-
         tick();
+      })
+      .catch(() => {
+        stopScanner();
       });
 
     return () => stopScanner();
@@ -50,21 +60,20 @@ export default function PurchaseForm() {
 
   const stopScanner = () => {
     const tracks = videoRef.current?.srcObject?.getTracks();
-    tracks?.forEach((track) => track.stop());
+    tracks?.forEach((t) => t.stop());
     setScannerVisible(false);
   };
 
   const hexToDecimal = (hex) => parseInt(hex, 16);
-
-  const validateTicketCode = (code) => {
-    const first4 = code.substring(0, 4);
-    const last5 = code.substring(code.length - 5);
+  const validateTicketCode = (c) => {
+    if (c.length !== 13) return false;
+    const first4 = c.slice(0, 4);
+    const last5 = c.slice(-5);
     return hexToDecimal(first4) + hexToDecimal(last5) === 468529;
   };
 
   const validateForm = () => {
     const newErrors = {};
-
     if (!name.trim()) {
       newErrors.name = "Bitte Namen eingeben";
     } else if (name.trim().split(" ").length < 2) {
@@ -73,13 +82,17 @@ export default function PurchaseForm() {
 
     if (!klasse.trim()) {
       newErrors.klasse = "Bitte Klasse eingeben";
-    } else if (!/^(5[abcd]|6[abcd]|7[abcd]|8[abcd]|9[abcd]|10[abcd]|11[abcd]|12|13)$/i.test(klasse)) {
+    } else if (
+      !/^(5[abcd]|6[abcd]|7[abcd]|8[abcd]|9[abcd]|10[abcd]|11[abcd]|12|13)$/i.test(
+        klasse
+      )
+    ) {
       newErrors.klasse = "Diese Klasse existiert nicht :P";
     }
 
     if (!code.trim()) {
       newErrors.code = "Bitte Ticket-Code eingeben";
-    } else if (code.length !== 13 || !validateTicketCode(code)) {
+    } else if (!validateTicketCode(code.trim())) {
       newErrors.code = "Der Ticket-Code ist nicht valide";
     }
 
@@ -89,74 +102,126 @@ export default function PurchaseForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log("Formulardaten:", { name, klasse, code });
-      // Hier könntest du z. B. fetch('/purchase', {...}) machen
-    }
+    if (!validateForm()) return;
+
+      const shortName = name
+    .trim()
+    .split(" ")
+    .map(part => part.slice(0, 2))
+    .join(" ");
+
+    const data = {
+      name: shortName,
+      klasse: klasse.trim(),
+      code: code.trim(),
+    };
+
+    // set and show the JSON payload fullscreen
+    setPayload(data);
+    setShowPayload(true);
   };
 
   return (
-    <body className="purcase">
-    <div className="container">
-      <form onSubmit={handleSubmit} id="ausgabe">
-        <h1>Ticket Ausgabe</h1>
-
-        <div className="input-control">
-          <label htmlFor="name">Name</label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <div className="error">{errors.name}</div>
+    <>
+      {showPayload && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex flex-col items-center justify-center z-50 p-8">
+          <button
+            onClick={() => setShowPayload(false)}
+            className="self-end text-white text-xl font-bold mb-4"
+          >
+            ✕
+          </button>
+          <pre className="bg-white rounded-lg p-6 w-full max-w-2xl overflow-auto text-sm">
+            {JSON.stringify(payload, null, 2)}
+          </pre>
         </div>
+      )}
 
-        <div className="input-control">
-          <input
-            id="klasse"
-            name="klasse"
-            type="text"
-            placeholder="Klasse"
-            value={klasse}
-            onChange={(e) => setKlasse(e.target.value)}
-          />
-          <div className="error">{errors.klasse}</div>
+      <div className="relative w-full h-screen">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')",
+            filter: "brightness(0.6)",
+            zIndex: 0,
+          }}
+        />
+
+        <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md space-y-6"
+          >
+            <h2 className="text-2xl font-bold text-center text-gray-800">
+              Ticket Ausgabe
+            </h2>
+
+            {(errors.name || errors.klasse || errors.code) && (
+              <div className="text-red-500 text-sm text-center">
+                {errors.name || errors.klasse || errors.code}
+              </div>
+            )}
+
+            <input
+              type="text"
+              placeholder="Vor- und Nachname"
+              className="w-full p-3 border border-gray-300 rounded-lg"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+
+            <input
+              type="text"
+              placeholder="Klasse"
+              className="w-full p-3 border border-gray-300 rounded-lg"
+              value={klasse}
+              onChange={(e) => setKlasse(e.target.value)}
+            />
+
+            <input
+              type="text"
+              placeholder="Ticket-Code scannen oder eingeben"
+              className="w-full p-3 border border-gray-300 rounded-lg"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+
+            <button
+              type="button"
+              onClick={() => setScannerVisible(true)}
+              className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition"
+            >
+              QR Code Scanner
+            </button>
+
+            {scannerVisible && (
+              <>
+                <video ref={videoRef} className="hidden" />
+                <canvas
+                  ref={canvasRef}
+                  className="w-full h-80 border border-gray-300 rounded-lg mt-4"
+                />
+              </>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition"
+            >
+              Ausgeben
+            </button>
+
+            <button
+              type="button"
+              onClick={() => (window.location.href = "/staff")}
+              className="w-full bg-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-400 transition"
+            >
+              Zurück
+            </button>
+          </form>
         </div>
-
-        <div className="input-control">
-          <input
-            id="code"
-            name="code"
-            type="text"
-            placeholder="Scannen oder eingeben"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-          <div className="error">{errors.code}</div>
-        </div>
-
-        <div id="container">
-          <input
-            type="button"
-            id="btn-scan-qr"
-            value="QR Code Scanner"
-            onClick={() => setScannerVisible(true)}
-          />
-          {scannerVisible && (
-            <>
-              <video ref={videoRef} style={{ display: "none" }} />
-              <canvas ref={canvasRef} style={{height:"350px", width:"350px" }} />
-            </>
-          )}
-        </div>
-
-        <input type="submit" value="submit" />
-        <input type="button" value="Zurück" onClick={() => (window.location = "./staff")} />
-      </form>
-    </div>
-    </body>
+      </div>
+    </>
   );
 }
