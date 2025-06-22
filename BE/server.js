@@ -13,6 +13,7 @@ const { ChartJSNodeCanvas } = require('chartjs-node-canvas'); // Add this at the
 const app = express();
 const PORT = process.env.PORT || 4000;
 const SECRET = process.env.JWT_SECRET;
+const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -45,6 +46,16 @@ function authenticateToken(req, res, next) {
     req.user = user; // user contains { id, username, role, iat, exp }
     next();
   });
+}
+
+// Middleware to check Discord bot token
+function authenticateDiscordBot(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token || token !== DISCORD_BOT_TOKEN) {
+    return res.status(401).json({ message: 'Unauthorized: Invalid or missing bot token' });
+  }
+  next();
 }
 
 // Test DB connection on startup
@@ -334,11 +345,37 @@ app.get('/api/stats/sales-per-user', async (req, res) => {
 });
 
 // Chart image endpoint for Discord bot or other integrations
-app.get('/api/stats/chart/:type/image', async (req, res) => {
+app.get('/api/stats/chart/:type/image', authenticateDiscordBot, async (req, res) => {
   const { type } = req.params;
   const width = 900;
   const height = 500;
   const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
+
+  // --- User authentication (same as /api/login) ---
+  const username = req.headers['x-username'];
+  const password = req.headers['x-password'];
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Benutzername und Passwort erforderlich' });
+  }
+  try {
+    const [rows] = await pool.execute(
+      'SELECT * FROM accounts WHERE username = ?',
+      [username]
+    );
+    if (rows.length === 0) {
+      return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
+    }
+    const user = rows[0];
+    const storedHash = user.password;
+    const isMatch = await bcrypt.compare(password, storedHash);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
+    }
+  } catch (err) {
+    console.error('Chart image user auth error:', err);
+    return res.status(500).json({ message: 'Serverfehler bei Authentifizierung' });
+  }
+  // --- End user authentication ---
 
   let chartConfig = null;
 
