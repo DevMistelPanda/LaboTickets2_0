@@ -515,7 +515,7 @@ app.post('/api/visitors/enter', async (req, res) => {
   try {
     // Prüfe, ob Besucher mit diesem Code existiert
     const [rows] = await pool.execute(
-      'SELECT * FROM besucher WHERE code = ?',
+      'SELECT * FROM besucher WHERE ticket = ?',
       [code]
     );
     if (rows.length === 0) {
@@ -527,7 +527,7 @@ app.post('/api/visitors/enter', async (req, res) => {
     }
     // Markiere als eingetreten
     await pool.execute(
-      'UPDATE besucher SET entered = 1, edate = ? WHERE code = ?',
+      'UPDATE besucher SET entered = 1, edate = ? WHERE ticket = ?',
       [new Date().toLocaleString('de-DE', { hour12: false }), code]
     );
     res.json({ message: 'Eintritt registriert' });
@@ -546,7 +546,7 @@ app.post('/api/visitors/purchase', async (req, res) => {
   try {
     // Prüfe, ob Code schon existiert
     const [rows] = await pool.execute(
-      'SELECT * FROM besucher WHERE code = ?',
+      'SELECT * FROM besucher WHERE ticket = ?',
       [code]
     );
     if (rows.length > 0) {
@@ -554,7 +554,7 @@ app.post('/api/visitors/purchase', async (req, res) => {
     }
     // Eintragen
     await pool.execute(
-      'INSERT INTO besucher (name, class, code, entered, vdate) VALUES (?, ?, ?, 0, ?)',
+      'INSERT INTO besucher (name, class, ticket, entered, vdate) VALUES (?, ?, ?, 0, ?)',
       [name, klasse, code, new Date().toLocaleString('de-DE', { hour12: false })]
     );
     res.json({ message: 'Ticket erfolgreich verkauft' });
