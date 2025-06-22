@@ -23,7 +23,7 @@ export default function Scanner() {
     message: "",
   });
 
-  // Helper: aus "Vorname Nachname" => "Vo Na"
+  // Kurz-Name aus "Vorname Nachname" => "Vo Na"
   const makeShortName = (fullName) =>
     fullName
       .trim()
@@ -34,15 +34,12 @@ export default function Scanner() {
   // 1) Klasse vom Backend holen
   useEffect(() => {
     fetch("/api/user/klasse")
-      .then((res) => {
-        if (!res.ok) throw new Error("503");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
         setKlasse(data.klasse);
       })
-      .catch(() => {
-        setClassError("Service momentan nicht verfügbar (503)");
+      .catch((err) => {
+        setClassError("Fehler beim Laden der Klasse");
       })
       .finally(() => {
         setLoadingClass(false);
@@ -86,6 +83,7 @@ export default function Scanner() {
               setCode(qr.data);
               cancelAnimationFrame(animationId);
               stream.getTracks().forEach((t) => t.stop());
+              return;
             }
           }
           animationId = requestAnimationFrame(scan);
@@ -136,9 +134,6 @@ export default function Scanner() {
         type: "reject",
         color: "blue",
         message: "Nicht gültig / schon auf dem Ball",
-        nameShort: "",
-        klasse: "",
-        code: "",
       });
       return;
     }
@@ -155,52 +150,33 @@ export default function Scanner() {
         type: "reject",
         color: "blue",
         message: "Ungültiger QR-Inhalt",
-        nameShort: "",
-        klasse: "",
-        code: "",
       });
       return;
     }
 
-    // Send data to backend to enter visitor
-    try {
-      const response = await fetch("/api/visitors/enter", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name: parsed.name,
-          klasse: parsed.klasse,
-          code: parsed.code
-        })
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        setPopup({
-          visible: true,
-          type: "reject",
-          color: "blue",
-          message: data?.message || "Fehler beim Eintragen",
-          nameShort: "",
-          klasse: "",
-          code: "",
-        });
-        return;
-      }
-    } catch (err) {
+    // --- 503-Errorhandling entfernt: nur eine einfache fetch-Logik ---
+    const response = await fetch("/api/visitors/enter", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: parsed.name,
+        klasse: parsed.klasse,
+        code: parsed.code,
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
       setPopup({
         visible: true,
         type: "reject",
         color: "blue",
-        message: "Serverfehler beim Eintragen",
-        nameShort: "",
-        klasse: "",
-        code: "",
+        message: data.message || "Fehler beim Eintragen",
       });
       return;
     }
 
+    // Erfolgreicher Eintrag
     const num = parseInt(parsed.klasse, 10);
     const color = num >= 9 ? "green" : "red";
     setPopup({
@@ -224,11 +200,10 @@ export default function Scanner() {
       code: "",
       message: "",
     });
-    // neu scan starten
     window.location.reload();
   };
 
-  // 5) Klassendaten Laden/Error
+  // 5) Klassendaten laden / Fehleranzeige
   if (loadingClass) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -241,120 +216,3 @@ export default function Scanner() {
       <div className="flex items-center justify-center h-screen">
         <p className="text-red-500">{classError}</p>
       </div>
-    );
-  }
-
-  return (
-    <>
-      {/* FULLSCREEN POPUP */}
-      {popup.visible && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
-          <div
-            className={`bg-white rounded-lg shadow-xl p-8 w-full max-w-md text-center space-y-4
-              ${
-                popup.type === "accept"
-                  ? popup.color === "green"
-                    ? "border-2 border-green-600"
-                    : "border-2 border-red-600"
-                  : "border-2 border-blue-600"
-              }
-            `}
-          >
-            {popup.type === "accept" ? (
-              <>
-                <h3
-                  className={`text-2xl font-bold mb-2 ${
-                    popup.color === "green"
-                      ? "text-green-700"
-                      : "text-red-700"
-                  }`}
-                >
-                  Einlass erlaubt
-                </h3>
-                <p className="text-gray-800">
-                  Klasse: <span className="font-semibold">{popup.klasse}</span>
-                </p>
-                <p className="text-gray-800">
-                  Code: <span className="font-mono">{popup.code}</span>
-                </p>
-                <p className="text-gray-800">
-                  Name: <span className="font-semibold">{popup.nameShort}</span>
-                </p>
-              </>
-            ) : (
-              <h3 className="text-xl font-bold text-blue-700">
-                {popup.message}
-              </h3>
-            )}
-            <button
-              onClick={closePopup}
-              className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition"
-            >
-              Nächster
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* PAGE LAYOUT */}
-      <div className="relative w-full h-screen">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')",
-            filter: "brightness(0.6)",
-            zIndex: 0,
-          }}
-        />
-
-        <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
-          <form
-            id="scanner"
-            onSubmit={handleSubmit}
-            className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md space-y-6"
-          >
-            <h2 className="text-2xl font-bold text-center text-gray-800">
-              Ticket Scanning
-            </h2>
-
-            {error && (
-              <p className="text-red-500 text-sm text-center">{error}</p>
-            )}
-
-            <input
-              id="code"
-              name="code"
-              type="text"
-              placeholder="Ticket-Code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-            />
-
-            <button
-              type="submit"
-              className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition"
-            >
-              Prüfen
-            </button>
-
-            <button
-              type="button"
-              onClick={() => (window.location.href = "/staff")}
-              className="w-full bg-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-400 transition"
-            >
-              Zurück
-            </button>
-
-            <video ref={videoRef} className="hidden" />
-            <canvas
-              ref={canvasRef}
-              className="w-full h-80 border border-gray-300 rounded-lg mt-4"
-            />
-          </form>
-        </div>
-      </div>
-    </>
-  );
-}
