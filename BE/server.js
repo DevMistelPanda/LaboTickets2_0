@@ -527,10 +527,11 @@ app.post('/api/visitors/enter', async (req, res) => {
     if (visitor.entered) {
       return res.status(409).json({ message: 'Ticket wurde bereits eingelöst' });
     }
-    // Markiere als eingetreten
+    // Markiere als eingetreten (Europe/Berlin = UTC+2 in summer)
+    const now = new Date().toLocaleString('en-GB', { hour12: false, timeZone: 'Europe/Berlin' });
     await pool.execute(
       'UPDATE besucher SET entered = 1, edate = ? WHERE ticket = ?',
-      [new Date().toLocaleString('en-GB', { hour12: false }), code]
+      [now, code]
     );
     res.json({ message: 'Eintritt registriert' });
   } catch (err) {
@@ -559,10 +560,11 @@ app.post('/api/visitors/purchase', async (req, res) => {
     const [maxRows] = await pool.query('SELECT MAX(number) AS maxNumber FROM besucher');
     const nextNumber = (maxRows[0].maxNumber || 0) + 1;
 
-    // Eintragen
+    // Eintragen (Europe/Berlin = UTC+2 in summer)
+    const now = new Date().toLocaleString('en-GB', { hour12: false, timeZone: 'Europe/Berlin' });
     await pool.execute(
       'INSERT INTO besucher (name, class, ticket, entered, vdate, user, id, number) VALUES (?, ?, ?, 0, ?, ?, ?, ?)',
-      [name, klasse, code, new Date().toLocaleString('en-GB', { hour12: false }), user, id, nextNumber]
+      [name, klasse, code, now, user, id, nextNumber]
     );
     res.json({ message: 'Ticket erfolgreich verkauft' });
   } catch (err) {
@@ -621,8 +623,8 @@ app.post('/api/scanner', async (req, res) => {
         color
       });
     }
-    // Markiere als eingetreten
-    const now = new Date().toLocaleString('en-GB', { hour12: false });
+    // Markiere als eingetreten (Europe/Berlin = UTC+2 in summer)
+    const now = new Date().toLocaleString('en-GB', { hour12: false, timeZone: 'Europe/Berlin' });
     await pool.execute(
       'UPDATE besucher SET entered = 1, edate = ? WHERE ticket = ?',
       [now, code]
