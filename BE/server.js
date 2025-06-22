@@ -274,7 +274,7 @@ app.get('/api/stats/sales-over-time', async (req, res) => {
 // Tickets sold per class (numbers only)
 app.get('/api/stats/sales-per-class', async (req, res) => {
   try {
-    // Adjust column name as needed (e.g., 'class')
+    // Sortiere explizit nach Klassen 5-13 in der gewünschten Reihenfolge
     const [results] = await pool.query(`
       SELECT 
         REGEXP_REPLACE(class, '[^0-9]', '') AS class_number,
@@ -282,7 +282,8 @@ app.get('/api/stats/sales-per-class', async (req, res) => {
       FROM besucher
       WHERE class IS NOT NULL AND class != ''
       GROUP BY class_number
-      ORDER BY class_number
+      HAVING class_number IN ('5','6','7','8','9','10','11','12','13')
+      ORDER BY FIELD(class_number, '5','6','7','8','9','10','11','12','13')
     `);
     res.json(results);
   } catch (err) {
