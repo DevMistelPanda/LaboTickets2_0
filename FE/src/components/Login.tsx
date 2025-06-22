@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -12,7 +14,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:4000/api/login', {
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -29,7 +31,9 @@ const Login = () => {
       if (!res.ok) throw new Error(data.message || 'Login fehlgeschlagen');
 
       localStorage.setItem('token', data.token);
-      alert('Login erfolgreich!');
+      localStorage.setItem('username', username)
+      localStorage.setItem('role', data.role);
+      navigate('/staff');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -55,7 +59,7 @@ const Login = () => {
         >
           <h2 className="text-2xl font-bold text-center text-gray-800">Login</h2>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <input
             type="text"
@@ -66,8 +70,8 @@ const Login = () => {
             required
           />
           <input
-            type="Passwort"
-            placeholder="Password"
+            type="password"
+            placeholder="Passwort"
             className="w-full p-3 border border-gray-300 rounded-lg"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
