@@ -139,7 +139,6 @@ export default function Scanner() {
         nameShort: "",
         klasse: "",
         code: "",
-        message: "",
       });
       return;
     }
