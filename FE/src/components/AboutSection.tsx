@@ -1,4 +1,3 @@
-
 import { PartyPopper, Music, Users } from 'lucide-react';
 
 const AboutSection = () => {

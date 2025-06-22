@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { MapPin, Calendar, Clock, Users, Euro, Ticket } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const DetailsSection = () => {
   const pinterestRef = useRef<HTMLDivElement>(null);
