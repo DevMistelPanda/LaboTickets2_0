@@ -506,6 +506,64 @@ app.get('/api/stats/chart/:type/image', authenticateDiscordBot, async (req, res)
   }
 });
 
+// Besucher als "eingetreten" markieren (für Scanner)
+app.post('/api/visitors/enter', async (req, res) => {
+  const { name, klasse, code } = req.body;
+  if (!name || !klasse || !code) {
+    return res.status(400).json({ message: 'Name, Klasse und Code erforderlich' });
+  }
+  try {
+    // Prüfe, ob Besucher mit diesem Code existiert
+    const [rows] = await pool.execute(
+      'SELECT * FROM besucher WHERE code = ?',
+      [code]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Ticket nicht gefunden' });
+    }
+    const visitor = rows[0];
+    if (visitor.entered) {
+      return res.status(409).json({ message: 'Ticket wurde bereits eingelöst' });
+    }
+    // Markiere als eingetreten
+    await pool.execute(
+      'UPDATE besucher SET entered = 1, edate = ? WHERE code = ?',
+      [new Date().toLocaleString('de-DE', { hour12: false }), code]
+    );
+    res.json({ message: 'Eintritt registriert' });
+  } catch (err) {
+    console.error('Fehler beim Eintragen des Besuchers:', err);
+    res.status(500).json({ message: 'Serverfehler beim Eintragen' });
+  }
+});
+
+// Besucher beim Ticketverkauf in DB eintragen
+app.post('/api/visitors/purchase', async (req, res) => {
+  const { name, klasse, code } = req.body;
+  if (!name || !klasse || !code) {
+    return res.status(400).json({ message: 'Name, Klasse und Code erforderlich' });
+  }
+  try {
+    // Prüfe, ob Code schon existiert
+    const [rows] = await pool.execute(
+      'SELECT * FROM besucher WHERE code = ?',
+      [code]
+    );
+    if (rows.length > 0) {
+      return res.status(409).json({ message: 'Ticket-Code existiert bereits' });
+    }
+    // Eintragen
+    await pool.execute(
+      'INSERT INTO besucher (name, class, code, entered, vdate) VALUES (?, ?, ?, 0, ?)',
+      [name, klasse, code, new Date().toLocaleString('de-DE', { hour12: false })]
+    );
+    res.json({ message: 'Ticket erfolgreich verkauft' });
+  } catch (err) {
+    console.error('Fehler beim Ticketverkauf:', err);
+    res.status(500).json({ message: 'Serverfehler beim Ticketverkauf' });
+  }
+});
+
 // 🔹 Static file serving (frontend)
 app.use(express.static(path.join(__dirname, 'dist')));
 

@@ -102,7 +102,7 @@ export default function PurchaseForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -112,6 +112,29 @@ export default function PurchaseForm() {
       .split(" ")
       .map((part) => part.slice(0, 2))
       .join(" ");
+
+    // Backend-Request: Besucher in DB eintragen
+    try {
+      const response = await fetch("/api/visitors/purchase", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          klasse: klasse.trim(),
+          code: code.trim()
+        })
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        setErrors({ code: data?.message || "Fehler beim Eintragen" });
+        return;
+      }
+    } catch (err) {
+      setErrors({ code: "Serverfehler beim Eintragen" });
+      return;
+    }
 
     setConfirmedName(shortName);
     setConfirmedKlasse(klasse.trim());

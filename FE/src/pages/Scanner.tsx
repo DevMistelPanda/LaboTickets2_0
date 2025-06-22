@@ -113,7 +113,7 @@ export default function Scanner() {
   };
 
   // 4) Submit & Popup
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setPopup({
@@ -156,6 +156,45 @@ export default function Scanner() {
         type: "reject",
         color: "blue",
         message: "Ungültiger QR-Inhalt",
+        nameShort: "",
+        klasse: "",
+        code: "",
+      });
+      return;
+    }
+
+    // Send data to backend to enter visitor
+    try {
+      const response = await fetch("/api/visitors/enter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: parsed.name,
+          klasse: parsed.klasse,
+          code: parsed.code
+        })
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        setPopup({
+          visible: true,
+          type: "reject",
+          color: "blue",
+          message: data?.message || "Fehler beim Eintragen",
+          nameShort: "",
+          klasse: "",
+          code: "",
+        });
+        return;
+      }
+    } catch (err) {
+      setPopup({
+        visible: true,
+        type: "reject",
+        color: "blue",
+        message: "Serverfehler beim Eintragen",
         nameShort: "",
         klasse: "",
         code: "",
