@@ -5,12 +5,18 @@ import jsQR from "jsqr";
 export default function Scanner() {
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
+
+  const [klasse, setKlasse] = useState("");
+  const [loadingClass, setLoadingClass] = useState(true);
+  const [classError, setClassError] = useState("");
+
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+
   const [popup, setPopup] = useState({
     visible: false,
-    type: "",       // "accept" | "reject"
-    color: "",      // "green" | "red" | "blue"
+    type: "",    // "accept" | "reject"
+    color: "",   // "green" | "red" | "blue"
     nameShort: "",
     klasse: "",
     code: "",
@@ -25,7 +31,25 @@ export default function Scanner() {
       .map((w) => w.slice(0, 2))
       .join(" ");
 
-  // QR-Scanner starten
+  // 1) Klasse vom Backend holen
+  useEffect(() => {
+    fetch("/api/user/klasse")
+      .then((res) => {
+        if (!res.ok) throw new Error("503");
+        return res.json();
+      })
+      .then((data) => {
+        setKlasse(data.klasse);
+      })
+      .catch(() => {
+        setClassError("Service momentan nicht verfügbar (503)");
+      })
+      .finally(() => {
+        setLoadingClass(false);
+      });
+  }, []);
+
+  // 2) QR-Scanner starten
   useEffect(() => {
     const constraints = { video: { facingMode: "environment" } };
     const video = videoRef.current;
@@ -53,7 +77,11 @@ export default function Scanner() {
               canvas.width,
               canvas.height
             );
-            const qr = jsQR(imageData.data, imageData.width, imageData.height);
+            const qr = jsQR(
+              imageData.data,
+              imageData.width,
+              imageData.height
+            );
             if (qr) {
               setCode(qr.data);
               cancelAnimationFrame(animationId);
@@ -75,7 +103,7 @@ export default function Scanner() {
     };
   }, []);
 
-  // Ticket-Code validieren
+  // 3) Ticket-Code validieren
   const hexToDecimal = (hex) => parseInt(hex, 16);
   const validateTicketCode = (c) => {
     if (c.length !== 13) return false;
@@ -84,10 +112,19 @@ export default function Scanner() {
     return hexToDecimal(first4) + hexToDecimal(last5) === 468529;
   };
 
+  // 4) Submit & Popup
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
-    setPopup({ visible: false, type: "", color: "", nameShort: "", klasse: "", code: "", message: "" });
+    setPopup({
+      visible: false,
+      type: "",
+      color: "",
+      nameShort: "",
+      klasse: "",
+      code: "",
+      message: "",
+    });
 
     if (!code.trim()) {
       setError("Bitte Ticket-Code eingeben oder scannen");
@@ -103,7 +140,6 @@ export default function Scanner() {
       return;
     }
 
-    // JSON im QR enthält name, klasse, code
     let parsed;
     try {
       parsed = JSON.parse(code);
@@ -134,16 +170,38 @@ export default function Scanner() {
   };
 
   const closePopup = () => {
-    setPopup({ visible: false, type: "", color: "", nameShort: "", klasse: "", code: "", message: "" });
-    setCode("");
-    setError("");
-    // Kamera neu starten
-    // (force re-render useEffect by clearing and remounting Scanner component)
+    setPopup({
+      visible: false,
+      type: "",
+      color: "",
+      nameShort: "",
+      klasse: "",
+      code: "",
+      message: "",
+    });
+    // neu scan starten
     window.location.reload();
   };
 
+  // 5) Klassendaten Laden/Error
+  if (loadingClass) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Lade Klassendaten…</p>
+      </div>
+    );
+  }
+  if (classError) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-red-500">{classError}</p>
+      </div>
+    );
+  }
+
   return (
     <>
+      {/* FULLSCREEN POPUP */}
       {popup.visible && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
           <div
@@ -161,7 +219,9 @@ export default function Scanner() {
               <>
                 <h3
                   className={`text-2xl font-bold mb-2 ${
-                    popup.color === "green" ? "text-green-700" : "text-red-700"
+                    popup.color === "green"
+                      ? "text-green-700"
+                      : "text-red-700"
                   }`}
                 >
                   Einlass erlaubt
@@ -177,7 +237,9 @@ export default function Scanner() {
                 </p>
               </>
             ) : (
-              <h3 className="text-xl font-bold text-blue-700">{popup.message}</h3>
+              <h3 className="text-xl font-bold text-blue-700">
+                {popup.message}
+              </h3>
             )}
             <button
               onClick={closePopup}
@@ -189,6 +251,7 @@ export default function Scanner() {
         </div>
       )}
 
+      {/* PAGE LAYOUT */}
       <div className="relative w-full h-screen">
         <div
           className="absolute inset-0 bg-cover bg-center"
