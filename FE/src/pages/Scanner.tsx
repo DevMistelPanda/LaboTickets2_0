@@ -5,17 +5,21 @@ import jsQR from "jsqr";
 export default function Scanner() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+
+  // wir speichern Stream und Frame-ID, um mehrfach starten/stoppen zu können
   const streamRef = useRef(null);
   const frameRef = useRef(null);
 
+  // Klassendaten
   const [klasse, setKlasse] = useState("");
   const [loadingClass, setLoadingClass] = useState(true);
   const [classError, setClassError] = useState("");
 
+  // Scan + Input
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
-  // popup.type: "confirm" | "accept" | "reject"
+  // Popup: confirm | accept | reject
   const [popup, setPopup] = useState({
     visible: false,
     type: "",
@@ -27,7 +31,7 @@ export default function Scanner() {
     message: "",
   });
 
-  // Helper: "Vorname Nachname" → "Vo Na"
+  // Hilfs-Funktion für Kurzname
   const makeShortName = (fullName) =>
     fullName
       .trim()
@@ -35,7 +39,7 @@ export default function Scanner() {
       .map((w) => w.slice(0, 2))
       .join(" ");
 
-  // 1) Klasse vom Backend laden
+  // 1) Klasse laden
   useEffect(() => {
     fetch("/api/user/klasse")
       .then((res) => res.json())
@@ -46,24 +50,23 @@ export default function Scanner() {
 
   // 2) Scanner starten / neu starten
   const startScanner = () => {
-    // Cleanup alter Instanzen
+    // alte Kamera/Loop stoppen
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
     }
 
+    // reset UI
     setError("");
     setCode("");
 
-    const constraints = { video: { facingMode: "environment" } };
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
-
     const ctx = canvas.getContext("2d");
 
     navigator.mediaDevices
-      .getUserMedia(constraints)
+      .getUserMedia({ video: { facingMode: "environment" } })
       .then((stream) => {
         streamRef.current = stream;
         video.srcObject = stream;
@@ -101,7 +104,6 @@ export default function Scanner() {
       .catch(() => setError("Kamera nicht verfügbar"));
   };
 
-  // Scanner beim Mount starten
   useEffect(() => {
     startScanner();
     return () => {
@@ -112,7 +114,7 @@ export default function Scanner() {
     };
   }, []);
 
-  // 3) Validierung
+  // 3) Ticket-Code validieren
   const hexToDecimal = (hex) => parseInt(hex, 16);
   const validateTicketCode = (c) => {
     if (c.length !== 13) return false;
@@ -121,71 +123,73 @@ export default function Scanner() {
     return hexToDecimal(first4) + hexToDecimal(last5) === 468529;
   };
 
-  // 4a) Beim Klicken auf "Prüfen": vorläufig validieren und Confirm-Popup öffnen
+  // 4a) Erster Klick: Check → Confirm-Dialog
   const handleCheck = (e) => {
     e.preventDefault();
     setError("");
-    setPopup({ visible: false, type: "", message: "" });
+    setPopup({ visible: false, type: "" });
 
     if (!code.trim()) {
       setError("Bitte Ticket-Code eingeben oder scannen");
       return;
     }
     if (!validateTicketCode(code.trim())) {
-      return setPopup({
+      setPopup({
         visible: true,
         type: "reject",
         color: "blue",
         message: "Nicht gültig / schon auf dem Ball",
       });
+      return;
     }
 
     let parsed;
     try {
       parsed = JSON.parse(code);
     } catch {
-      return setPopup({
+      setPopup({
         visible: true,
         type: "reject",
         color: "blue",
         message: "Ungültiger QR-Inhalt",
       });
+      return;
     }
 
-    if (!parsed.name || !parsed.klasse || !parsed.code) {
-      return setPopup({
+    const { name, klasse: cls, code: c } = parsed;
+    if (!name || !cls || !c) {
+      setPopup({
         visible: true,
         type: "reject",
         color: "blue",
         message: "Ungültiger QR-Inhalt",
       });
+      return;
     }
 
-    // Confirm-Popup anzeigen
     setPopup({
       visible: true,
       type: "confirm",
       color: "gray",
-      name: parsed.name,
-      nameShort: makeShortName(parsed.name),
-      klasse: parsed.klasse,
-      code: parsed.code,
-      message: "",
+      name,
+      nameShort: makeShortName(name),
+      klasse: cls,
+      code: c,
     });
   };
 
-  // 4b) Nach Bestätigung: tatsächlicher API-Call
+  // 4b) Confirm gedrückt → API-Call
   const handleConfirm = async () => {
-    const { name, klasse, code } = popup;
+    const { name, klasse: cls, code: c } = popup;
 
     try {
       const res = await fetch("/api/visitors/enter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, klasse, code }),
+        body: JSON.stringify({ name, klasse: cls, code: c }),
       });
 
-      // 503 ignorieren und Scanner neu starten
+      // 503 ignorieren → Scanner neu starten
       if (res.status === 503) {
         setPopup({ visible: false, type: "" });
         startScanner();
@@ -193,27 +197,26 @@ export default function Scanner() {
       }
 
       if (!res.ok) {
-        const payload = await res.json().catch(() => ({}));
+        const data = await res.json().catch(() => ({}));
         setPopup({
           visible: true,
           type: "reject",
           color: "blue",
-          message: payload.message || "Fehler beim Eintragen",
+          message: data.message || "Fehler beim Eintragen",
         });
         return;
       }
 
       // Erfolg
-      const num = parseInt(klasse, 10);
-      const color = num >= 9 ? "green" : "red";
+      const num = parseInt(cls, 10);
+      const col = num >= 9 ? "green" : "red";
       setPopup({
         visible: true,
         type: "accept",
-        color,
+        color: col,
         nameShort: makeShortName(name),
-        klasse,
-        code,
-        message: "",
+        klasse: cls,
+        code: c,
       });
     } catch {
       setPopup({
@@ -231,7 +234,7 @@ export default function Scanner() {
     startScanner();
   };
 
-  // 5) Loading & Error States für Klassendaten
+  // 5) Lade- und Error-Zustände
   if (loadingClass) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -249,16 +252,14 @@ export default function Scanner() {
 
   return (
     <>
-      {/* FULLSCREEN POPUP */}
+      {/* POPUP */}
       {popup.visible && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
           <div
             className={`bg-white rounded-lg shadow-xl p-8 w-full max-w-md text-center space-y-4
               ${
                 popup.type === "accept"
-                  ? popup.color === "green"
-                    ? "border-2 border-green-600"
-                    : "border-2 border-red-600"
+                  ? `border-2 border-${popup.color}-600`
                   : popup.type === "reject"
                   ? "border-2 border-blue-600"
                   : "border-2 border-gray-600"
@@ -269,16 +270,11 @@ export default function Scanner() {
                 <h3 className="text-xl font-bold text-gray-700 mb-4">
                   Bitte bestätigen
                 </h3>
-                <p className="text-gray-800">
-                  Name: <span className="font-semibold">{popup.nameShort}</span>
+                <p>
+                  {popup.nameShort} – Klasse {popup.klasse}
                 </p>
-                <p className="text-gray-800">
-                  Klasse: <span className="font-semibold">{popup.klasse}</span>
-                </p>
-                <p className="text-gray-800">
-                  Code: <span className="font-mono">{popup.code}</span>
-                </p>
-                <div className="flex space-x-4 mt-6">
+                <p className="font-mono">{popup.code}</p>
+                <div className="flex mt-6 space-x-4">
                   <button
                     onClick={handleConfirm}
                     className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
@@ -298,26 +294,16 @@ export default function Scanner() {
             {popup.type === "accept" && (
               <>
                 <h3
-                  className={`text-2xl font-bold mb-2 ${
-                    popup.color === "green"
-                      ? "text-green-700"
-                      : "text-red-700"
-                  }`}
+                  className={`text-2xl font-bold mb-2 text-${popup.color}-700`}
                 >
                   Einlass erlaubt
                 </h3>
-                <p className="text-gray-800">
-                  Klasse: <span className="font-semibold">{popup.klasse}</span>
-                </p>
-                <p className="text-gray-800">
-                  Code: <span className="font-mono">{popup.code}</span>
-                </p>
-                <p className="text-gray-800">
-                  Name: <span className="font-semibold">{popup.nameShort}</span>
-                </p>
+                <p>Klasse: {popup.klasse}</p>
+                <p className="font-mono">{popup.code}</p>
+                <p>Name: {popup.nameShort}</p>
                 <button
                   onClick={closePopup}
-                  className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition mt-4"
+                  className="w-full bg-party-purple text-white py-3 rounded-lg hover:bg-purple-700 mt-4"
                 >
                   Nächster
                 </button>
@@ -331,7 +317,7 @@ export default function Scanner() {
                 </h3>
                 <button
                   onClick={closePopup}
-                  className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition mt-4"
+                  className="w-full bg-party-purple text-white py-3 rounded-lg hover:bg-purple-700 mt-4"
                 >
                   Nächster
                 </button>
@@ -341,7 +327,7 @@ export default function Scanner() {
         </div>
       )}
 
-      {/* MAIN LAYOUT */}
+      {/* HAUPTSEITE */}
       <div className="relative w-full h-screen">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -355,43 +341,35 @@ export default function Scanner() {
 
         <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
           <form
-            id="scanner"
             onSubmit={handleCheck}
             className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md space-y-6"
           >
             <h2 className="text-2xl font-bold text-center text-gray-800">
               Ticket Scanning
             </h2>
-
             {error && (
               <p className="text-red-500 text-sm text-center">{error}</p>
             )}
-
             <input
-              id="code"
-              name="code"
               type="text"
               placeholder="Ticket-Code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg"
             />
-
             <button
               type="submit"
-              className="w-full bg-party-purple text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition"
+              className="w-full bg-party-purple text-white py-3 rounded-lg hover:bg-purple-700"
             >
               Prüfen
             </button>
-
             <button
               type="button"
               onClick={() => (window.location.href = "/staff")}
-              className="w-full bg-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-400 transition"
+              className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400"
             >
               Zurück
             </button>
-
             <video ref={videoRef} className="hidden" />
             <canvas
               ref={canvasRef}
