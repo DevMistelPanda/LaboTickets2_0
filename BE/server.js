@@ -571,6 +571,81 @@ app.post('/api/visitors/purchase', async (req, res) => {
   }
 });
 
+// --- SCANNER ENDPOINT for FE/src/pages/Scanner.tsx ---
+app.post('/api/scanner', async (req, res) => {
+  const { code } = req.body;
+  if (!code) {
+    return res.status(400).json({
+      html: '<div class="text-red-600 font-bold">Kein Ticket-Code angegeben.</div>',
+      color: 'red'
+    });
+  }
+  try {
+    const [rows] = await pool.execute(
+      'SELECT * FROM besucher WHERE ticket = ?',
+      [code]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({
+        html: '<div class="text-red-600 font-bold">Ticket nicht gefunden.</div>',
+        color: 'red'
+      });
+    }
+    const visitor = rows[0];
+
+    // Determine color by class (simple mapping, adjust as needed)
+    let color = 'gray';
+    const classMap = {
+      '5': 'green',
+      '6': 'green',
+      '7': 'green',
+      '8': 'green',
+      '9': 'red',
+      '10': 'red',
+      '11': 'red',
+      '12': 'red',
+      '13': 'red'
+    };
+    // Extract number from class string
+    const classNumber = (visitor.class || '').replace(/[^0-9]/g, '');
+    if (classMap[classNumber]) color = classMap[classNumber];
+
+    if (visitor.entered) {
+      return res.status(409).json({
+        html: `
+          <div class="text-red-600 font-bold text-xl mb-2">Ticket bereits eingelöst!</div>
+          <div class="mb-1">Name: <span class="font-semibold">${visitor.name}</span></div>
+          <div class="mb-1">Klasse: <span class="font-semibold">${visitor.class}</span></div>
+          <div class="mb-1">Eingetreten am: <span class="font-semibold">${visitor.edate || '-'}</span></div>
+        `,
+        color
+      });
+    }
+    // Markiere als eingetreten
+    const now = new Date().toLocaleString('en-GB', { hour12: false });
+    await pool.execute(
+      'UPDATE besucher SET entered = 1, edate = ? WHERE ticket = ?',
+      [now, code]
+    );
+    return res.json({
+      html: `
+        <div class="text-green-600 font-bold text-2xl mb-2">Einlass erlaubt!</div>
+        <div class="mb-1">Name: <span class="font-semibold">${visitor.name}</span></div>
+        <div class="mb-1">Klasse: <span class="font-semibold">${visitor.class}</span></div>
+        <div class="mb-1">Ticket-Code: <span class="font-mono">${visitor.ticket}</span></div>
+        <div class="mb-1">Eintrittszeit: <span class="font-semibold">${now}</span></div>
+      `,
+      color
+    });
+  } catch (err) {
+    console.error('Fehler beim Scannen:', err);
+    res.status(500).json({
+      html: '<div class="text-red-600 font-bold">Serverfehler beim Prüfen des Tickets.</div>',
+      color: 'red'
+    });
+  }
+});
+
 // 🔹 Static file serving (frontend)
 app.use(express.static(path.join(__dirname, 'dist')));
 
