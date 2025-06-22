@@ -74,7 +74,7 @@ const Header = () => {
               </a>
             ))}
             <Button className="w-full bg-party-purple hover:bg-party-blue text-white rounded-full px-6 mt-4">
-              <a href="#" onClick={() => setIsMenuOpen(false)}>Login</a>
+              <a href="./login" onClick={() => setIsMenuOpen(false)}>Login</a>
             </Button>
           </nav>
         )}
