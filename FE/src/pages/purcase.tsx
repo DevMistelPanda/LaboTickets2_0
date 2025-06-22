@@ -12,9 +12,11 @@ export default function PurchaseForm() {
   const [errors, setErrors] = useState({});
   const [scannerVisible, setScannerVisible] = useState(false);
 
-  // state to hold and show the JSON payload
-  const [payload, setPayload] = useState(null);
-  const [showPayload, setShowPayload] = useState(false);
+  // confirmation overlay state
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmedName, setConfirmedName] = useState("");
+  const [confirmedKlasse, setConfirmedKlasse] = useState("");
+  const [confirmedCode, setConfirmedCode] = useState("");
 
   useEffect(() => {
     if (!scannerVisible) return;
@@ -104,40 +106,45 @@ export default function PurchaseForm() {
     e.preventDefault();
     if (!validateForm()) return;
 
-      const shortName = name
-    .trim()
-    .split(" ")
-    .map(part => part.slice(0, 2))
-    .join(" ");
+    // kurze Form des Namens: jeweils erste 2 Buchstaben
+    const shortName = name
+      .trim()
+      .split(" ")
+      .map((part) => part.slice(0, 2))
+      .join(" ");
 
-    const data = {
-      name: shortName,
-      klasse: klasse.trim(),
-      code: code.trim(),
-    };
-
-    // set and show the JSON payload fullscreen
-    setPayload(data);
-    setShowPayload(true);
+    setConfirmedName(shortName);
+    setConfirmedKlasse(klasse.trim());
+    setConfirmedCode(code.trim());
+    setShowConfirmation(true);
   };
 
   return (
     <>
-      {showPayload && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex flex-col items-center justify-center z-50 p-8">
-          <button
-            onClick={() => setShowPayload(false)}
-            className="self-end text-white text-xl font-bold mb-4"
-          >
-            ✕
-          </button>
-          <pre className="bg-white rounded-lg p-6 w-full max-w-2xl overflow-auto text-sm">
-            {JSON.stringify(payload, null, 2)}
-          </pre>
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full space-y-4 text-center">
+            <h3 className="text-2xl font-bold text-green-600">
+              Verkauf erfolgreich!
+            </h3>
+            <p className="text-gray-800">
+              Ticket verkauft an{" "}
+              <span className="font-semibold">{confirmedName}</span>, Klasse{" "}
+              <span className="font-semibold">{confirmedKlasse}</span>, Code{" "}
+              <span className="font-mono">{confirmedCode}</span>
+            </p>
+            <button
+              onClick={() => setShowConfirmation(false)}
+              className="mt-4 bg-party-purple text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 transition"
+            >
+              Schließen
+            </button>
+          </div>
         </div>
       )}
 
       <div className="relative w-full h-screen">
+        {/* Hintergrundbild */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
