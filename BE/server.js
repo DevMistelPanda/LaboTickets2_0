@@ -276,7 +276,8 @@ app.get('/api/stats/sales-over-time', async (req, res) => {
       GROUP BY DATE(STR_TO_DATE(vdate, '%d/%m/%Y'))
       ORDER BY DATE(STR_TO_DATE(vdate, '%d/%m/%Y'))
     `);
-    res.json(results);
+    // Filter out rows where date is null to prevent frontend errors
+    res.json(results.filter(r => r.date !== null));
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Fehler beim Abrufen der Verkaufsdaten' });
@@ -308,6 +309,7 @@ app.get('/api/stats/sales-per-class', async (req, res) => {
 app.get('/api/stats/entered-over-time', async (req, res) => {
   try {
     // Extract hour from edate (VARCHAR) using STR_TO_DATE and TIME_FORMAT
+    // Allow edate to be NULL, but ignore those rows in the result
     const [results] = await pool.query(`
       SELECT 
         LPAD(HOUR(STR_TO_DATE(SUBSTRING_INDEX(edate, ',', -1), ' %H:%i:%s')), 2, '0') AS hour,
@@ -315,7 +317,7 @@ app.get('/api/stats/entered-over-time', async (req, res) => {
       FROM besucher
       WHERE edate IS NOT NULL AND edate != ''
       GROUP BY hour
-      HAVING hour >= '15' AND hour <= '22'
+      HAVING hour IS NOT NULL AND hour >= '15' AND hour <= '22'
       ORDER BY hour
     `);
     res.json(results);
@@ -444,7 +446,7 @@ app.get('/api/stats/chart/:type/image', authenticateDiscordBot, async (req, res)
         FROM besucher
         WHERE edate IS NOT NULL AND edate != ''
         GROUP BY hour
-        HAVING hour >= '15' AND hour <= '22'
+        HAVING hour IS NOT NULL AND hour >= '15' AND hour <= '22'
         ORDER BY hour
       `);
       chartConfig = {
@@ -528,7 +530,7 @@ app.post('/api/visitors/enter', async (req, res) => {
     // Markiere als eingetreten
     await pool.execute(
       'UPDATE besucher SET entered = 1, edate = ? WHERE ticket = ?',
-      [new Date().toLocaleString('de-DE', { hour12: false }), code]
+      [new Date().toLocaleString('en-GB', { hour12: false }), code]
     );
     res.json({ message: 'Eintritt registriert' });
   } catch (err) {
@@ -539,7 +541,7 @@ app.post('/api/visitors/enter', async (req, res) => {
 
 // Besucher beim Ticketverkauf in DB eintragen
 app.post('/api/visitors/purchase', async (req, res) => {
-  const { name, klasse, code } = req.body;
+  const { name, klasse, code, user } = req.body;
   if (!name || !klasse || !code) {
     return res.status(400).json({ message: 'Name, Klasse und Code erforderlich' });
   }
@@ -554,8 +556,8 @@ app.post('/api/visitors/purchase', async (req, res) => {
     }
     // Eintragen
     await pool.execute(
-      'INSERT INTO besucher (name, class, ticket, entered, vdate) VALUES (?, ?, ?, 0, ?)',
-      [name, klasse, code, new Date().toLocaleString('de-DE', { hour12: false })]
+      'INSERT INTO besucher (name, class, ticket, entered, vdate, user) VALUES (?, ?, ?, 0, ?, ?)',
+      [name, klasse, code, new Date().toLocaleString('en-GB', { hour12: false }), user]
     );
     res.json({ message: 'Ticket erfolgreich verkauft' });
   } catch (err) {

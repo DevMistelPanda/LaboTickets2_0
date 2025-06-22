@@ -102,6 +102,17 @@ export default function PurchaseForm() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const getUsernameFromToken = () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return "";
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.username || "";
+    } catch {
+      return "";
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -118,12 +129,14 @@ export default function PurchaseForm() {
       const response = await fetch("/api/visitors/purchase", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
         },
         body: JSON.stringify({
           name: name.trim(),
           klasse: klasse.trim(),
-          code: code.trim()
+          code: code.trim(),
+          user: getUsernameFromToken()
         })
       });
       if (!response.ok) {
