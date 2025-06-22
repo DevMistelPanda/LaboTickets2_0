@@ -49,7 +49,10 @@ const StatsDashboard = () => {
             <h2 className="text-2xl font-bold mb-4">Tickets verkauft über die Zeit</h2>
             <Line
             data={{
-                labels: salesOverTime.map(d => d.date),
+                labels: salesOverTime.map(d => 
+                  // Only show the date part (assumes ISO string, e.g. "2024-06-01T12:00:00Z")
+                  d.date.split('T')[0]
+                ),
                 datasets: [
                 {
                     label: 'Tickets verkauft',
