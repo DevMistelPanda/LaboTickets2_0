@@ -291,6 +291,27 @@ app.get('/api/stats/sales-per-class', async (req, res) => {
   }
 });
 
+// People entered over time (by entry HOUR, date irrelevant)
+app.get('/api/stats/entered-over-time', async (req, res) => {
+  try {
+    // Extract hour from edate (VARCHAR) using STR_TO_DATE and TIME_FORMAT
+    const [results] = await pool.query(`
+      SELECT 
+        LPAD(HOUR(STR_TO_DATE(SUBSTRING_INDEX(edate, ',', -1), ' %H:%i:%s')), 2, '0') AS hour,
+        COUNT(*) AS entered
+      FROM besucher
+      WHERE edate IS NOT NULL AND edate != ''
+      GROUP BY hour
+      HAVING hour >= '15' AND hour <= '22'
+      ORDER BY hour
+    `);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Eintrittszeiten' });
+  }
+});
+
 // 🔹 Static file serving (frontend)
 app.use(express.static(path.join(__dirname, 'dist')));
 

@@ -26,6 +26,7 @@ ChartJS.register(
 const StatsDashboard = () => {
   const [salesOverTime, setSalesOverTime] = useState<{ date: string; sold: number }[]>([]);
   const [salesPerClass, setSalesPerClass] = useState<{ class_number: string; sold: number }[]>([]);
+  const [enteredOverTime, setEnteredOverTime] = useState<{ hour: string; entered: number }[]>([]);
 
   useEffect(() => {
     fetch('/api/stats/sales-over-time')
@@ -35,6 +36,10 @@ const StatsDashboard = () => {
     fetch('/api/stats/sales-per-class')
       .then(res => res.json())
       .then(setSalesPerClass);
+
+    fetch('/api/stats/entered-over-time')
+      .then(res => res.json())
+      .then(setEnteredOverTime);
   }, []);
 
   return (
@@ -91,6 +96,32 @@ const StatsDashboard = () => {
             }}
             />
         </div>
+        <div>
+        <h2 className="text-2xl font-bold mb-4">Eintritte nach Uhrzeit</h2>
+        <Bar
+          data={{
+            labels: enteredOverTime.map(d => `${d.hour}:00`),
+            datasets: [
+              {
+                label: 'Eintritte',
+                data: enteredOverTime.map(d => d.entered),
+                backgroundColor: '#10b981',
+              },
+            ],
+          }}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              title: { display: false },
+            },
+            scales: {
+              x: { title: { display: true, text: 'Uhrzeit' } },
+              y: { title: { display: true, text: 'Eintritte' }, beginAtZero: true },
+            },
+          }}
+        />
+      </div>
         </div>
     </section>
   );
