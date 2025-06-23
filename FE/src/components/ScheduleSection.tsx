@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +17,7 @@ const ScheduleSection = () => {
     },
     {
       time: "20:00 Uhr",
-      title: "Ende für 5. -8. KLassen",
+      title: "Ende für 5. - 8. Klassen",
       description: "Aus rechtlichen Gründen müssen die jüngeren Schüler um 20:00 Uhr den Ball verlassen."
     },
     {
@@ -38,7 +37,7 @@ const ScheduleSection = () => {
       name: "AK Licht & Ton",
       role: "DJ",
       image: "https://images.pexels.com/photos/63703/pexels-photo-63703.jpeg",
-      description: "Unser AK Licht & Ton wrid den Abend mit einem DJ begleiten, der für die richtige Stimmung sorgt."
+      description: "Unser AK Licht & Ton wird den Abend mit einem DJ begleiten, der für die richtige Stimmung sorgt."
     },
     {
       name: "Schulball Playlist 2024",

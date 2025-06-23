@@ -26,7 +26,7 @@ const AboutSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Infos zum Ball</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            Auch dieses Jahr ist es wieder soweit: Der Schulball steht vor der Tür! Wir freuen uns darauf, mit euch eine unvergesslichen Abend voller Musik, Tanz und guter Laune zu verbringen.
+            Auch dieses Jahr ist es wieder soweit: Der Schulball steht vor der Tür! Wir freuen uns darauf, mit euch einen unvergesslichen Abend voller Musik, Tanz und guter Laune zu verbringen.
           </p>
         </div>
 
@@ -46,29 +46,29 @@ const AboutSection = () => {
         <div className="mt-16 bg-white p-8 rounded-xl shadow-md">
           <h3 className="text-2xl font-bold mb-4 text-center text-party-dark">Was erwartet euch</h3>
           <p className="text-party-gray mb-6">
-                Unsere Schulball ist der perfekte Weg, um das Ende des Schuljahres zu feiern. Mit dabei sind:
-                </p>
-                <ul className="space-y-2 text-party-gray">
-                <li className="flex items-start">
-                  <span className="text-party-purple mr-2">✓</span>
-                  <span>Ein professionell dekorierter Veranstaltungsort</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-party-purple mr-2">✓</span>
-                  <span>Fotowand mit Requisiten für die Perfekten Erinnerungen</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-party-purple mr-2">✓</span>
-                  <span>Erfrischungsgetränke werden über den ganzen Abend verkauft</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-party-purple mr-2">✓</span>
-                  <span>Ruhiger Bereich zum reden abseits der lauten Musik</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-party-purple mr-2">✓</span>
-                  <span>Musikwünsche sind immer Wilkommen</span>
-                </li>
+                Unser Schulball ist der perfekte Weg, um das Ende des Schuljahres zu feiern. Mit dabei sind:
+          </p>
+          <ul className="space-y-2 text-party-gray">
+            <li className="flex items-start">
+              <span className="text-party-purple mr-2">✓</span>
+              <span>Ein professionell dekorierter Veranstaltungsort</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-party-purple mr-2">✓</span>
+              <span>Fotowand mit Requisiten für die perfekten Erinnerungen</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-party-purple mr-2">✓</span>
+              <span>Erfrischungsgetränke werden über den ganzen Abend verkauft</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-party-purple mr-2">✓</span>
+              <span>Ruhiger Bereich zum Reden abseits der lauten Musik</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-party-purple mr-2">✓</span>
+              <span>Musikwünsche sind immer willkommen</span>
+            </li>
           </ul>
         </div>
       </div>

@@ -11,7 +11,8 @@ const FaqSection = () => {
   const faqs = [
     {
       question: "Was ist der Dresscode für den Ball?",
-      answer: "Der Dresscode ist: Maske im venezianischen Stil. Wir empfehlen dir auch elegante Kleidung. Für inspirationen frag gerne unseren AK."},
+      answer: "Der Dresscode ist: Maske im venezianischen Stil. Wir empfehlen dir auch elegante Kleidung. Für Inspirationen frag gerne unseren AK."
+    },
     {
       question: "Wo bekomme ich Tickets?",
       answer: "Die Tickets sind nach den Pfingstferien in den Pausen erhältlich."
@@ -34,7 +35,7 @@ const FaqSection = () => {
     },
     {
       question: "Welche Gegenstände / Substanzen sind verboten?",
-      answer: "Verboten sind: Alkohol, Drogen, Waffen, Feuerwerkskörper und andere gefährliche Gegenstände. Bitte respektiert diese Regeln, um die Sicherheit aller Teilnehmer zu gewährleisten."
+      answer: "Verboten sind: Alkohol, Drogen, Waffen, Feuerwerkskörper und andere gefährliche Gegenstände. Bitte respektiert diese Regeln, um die Sicherheit aller Teilnehmenden zu gewährleisten."
     },
     {
       question: "Wird es eine Taschenkontrolle geben?",
@@ -46,10 +47,10 @@ const FaqSection = () => {
     <section id="faq" className="py-16 md:py-24">
       <div className="section-container">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Die meisten Fragen</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Die häufigsten Fragen</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-           Ihr habt Fragen? Wir haben die Antwort! Hier findet ihr die häufigsten Fragen und Antworten rund um den Schulball.
+           Ihr habt Fragen? Wir haben die Antworten! Hier findet ihr die häufigsten Fragen und Antworten rund um den Schulball.
           </p>
         </div>
 
