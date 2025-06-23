@@ -105,7 +105,7 @@ export default function PurchaseForm() {
         klasse
       )
     ) {
-      newErrors.klasse = "Diese Klasse existiert nicht :P";
+      newErrors.klasse = "Diese Klasse existiert nicht 😛";
     }
 
     if (!code.trim()) {
@@ -159,11 +159,11 @@ export default function PurchaseForm() {
       });
       if (!response.ok) {
         const data = await response.json();
-        setErrors({ code: data?.message || "Fehler beim Eintragen" });
+        setErrors({ code: data?.message || "Fehler beim Eintragen." });
         return;
       }
     } catch (err) {
-      setErrors({ code: "Serverfehler beim Eintragen" });
+      setErrors({ code: "Serverfehler beim Eintragen." });
       return;
     }
 

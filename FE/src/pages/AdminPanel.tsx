@@ -54,7 +54,7 @@ const AdminPanel = () => {
         toast.error(`❌ Fehler: ${message}`);
       }
     } catch {
-      toast.error('❌ Funktionert schon aber gibt nen errror beim Senden der wichtigen News.');
+      toast.error('❌ Funktioniert schon, aber es gibt einen Fehler beim Senden der wichtigen News.');
     }
   };
 
@@ -103,7 +103,7 @@ const AdminPanel = () => {
         toast.error(`❌ Fehler: ${message}`);
       }
     } catch {
-      toast.error('❌ Funktionert schon aber gibt nen errror beim Senden der normalen News.');
+      toast.error('❌ Funktioniert schon, aber es gibt einen Fehler beim Senden der normalen News.');
     }
   };
 
