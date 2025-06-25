@@ -985,10 +985,13 @@ app.post('/api/admin/add-user', authenticateToken, async (req, res) => {
     if (rows.length > 0) {
       return res.status(409).json({ message: 'Benutzername existiert bereits' });
     }
+    // Ermittle höchste user id und erhöhe um 1
+    const [maxRows] = await pool.query('SELECT MAX(id) AS maxId FROM accounts');
+    const nextId = (maxRows[0].maxId || 0) + 1;
     const hash = await bcrypt.hash(password, 10);
     await pool.execute(
-      'INSERT INTO accounts (username, password, role, must_change_password) VALUES (?, ?, ?, 1)',
-      [username, hash, role]
+      'INSERT INTO accounts (id, username, password, role, must_change_password) VALUES (?, ?, ?, ?, 1)',
+      [nextId, username, hash, role]
     );
     res.json({ message: 'Nutzer erfolgreich hinzugefügt' });
   } catch (err) {
