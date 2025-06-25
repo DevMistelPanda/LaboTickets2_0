@@ -172,7 +172,7 @@ const StatsDashboard = () => {
         />
         {salesPerUser.length > 0 && (
           <div className="mt-2 text-center font-semibold text-orange-500">
-            🏆 Top Verkäufer: {salesPerUser[0].username} ({salesPerUser[0].sold} Tickets)
+            🏆 Top Verkäufer*in: {salesPerUser[0].username} ({salesPerUser[0].sold} Tickets)
           </div>
         )}
       </div>
