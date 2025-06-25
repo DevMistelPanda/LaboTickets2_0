@@ -9,6 +9,11 @@ const AdminPanel = () => {
   const [resetUser, setResetUser] = useState('');
   const [resetPw, setResetPw] = useState('');
   const [userList, setUserList] = useState<string[]>([]);
+  const [addUser, setAddUser] = useState('');
+  const [addPw, setAddPw] = useState('');
+  const [addRole, setAddRole] = useState('staff');
+  const [removeUser, setRemoveUser] = useState('');
+  const [removeConfirm, setRemoveConfirm] = useState(false);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -170,6 +175,112 @@ const AdminPanel = () => {
     }
   };
 
+  // Nutzer hinzufügen Handler
+  const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const currentToken = localStorage.getItem('token');
+    if (!currentToken) {
+      toast.error('Nicht eingeloggt.');
+      return;
+    }
+    if (!addUser || !addPw) {
+      toast.error('Bitte Benutzername und Passwort angeben.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/add-user', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: addUser, password: addPw, role: addRole }),
+      });
+      if (res.ok) {
+        toast.success('✅ Nutzer erfolgreich hinzugefügt!');
+        setAddUser('');
+        setAddPw('');
+        setAddRole('staff');
+        // Reload user list
+        const token = localStorage.getItem('token');
+        const res2 = await fetch('/api/admin/user-list', {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+        if (res2.ok) {
+          const data = await res2.json();
+          setUserList(data.users || []);
+        }
+      } else {
+        let message = 'Unbekannt';
+        try {
+          const data = await res.json();
+          message = data.message || message;
+        } catch {}
+        toast.error(`❌ Fehler: ${message}`);
+      }
+    } catch {
+      // Kein Toast hier, damit es nicht doppelt ist!
+    }
+  };
+
+  // Nutzer entfernen Handler
+  const handleRemoveUser = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!removeUser) {
+      toast.error('Bitte Benutzer auswählen.');
+      return;
+    }
+    if (!removeConfirm) {
+      setRemoveConfirm(true);
+      toast.warning('Bitte bestätigen Sie das Entfernen durch erneutes Klicken auf "Entfernen".');
+      return;
+    }
+    const currentToken = localStorage.getItem('token');
+    if (!currentToken) {
+      toast.error('Nicht eingeloggt.');
+      setRemoveConfirm(false);
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/remove-user', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: removeUser }),
+      });
+      if (res.ok) {
+        toast.success('✅ Nutzer erfolgreich entfernt!');
+        setRemoveUser('');
+        setRemoveConfirm(false);
+        // Reload user list
+        const token = localStorage.getItem('token');
+        const res2 = await fetch('/api/admin/user-list', {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+        if (res2.ok) {
+          const data = await res2.json();
+          setUserList(data.users || []);
+        }
+      } else {
+        let message = 'Unbekannt';
+        try {
+          const data = await res.json();
+          message = data.message || message;
+        } catch {}
+        toast.error(`❌ Fehler: ${message}`);
+        setRemoveConfirm(false);
+      }
+    } catch {
+      setRemoveConfirm(false);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -274,6 +385,76 @@ const AdminPanel = () => {
               >
                 Zurücksetzen
               </button>
+            </form>
+          </div>
+
+          {/* Nutzer hinzufügen */}
+          <div>
+            <h2 className="text-2xl font-bold text-party-purple mb-4">Nutzer hinzufügen</h2>
+            <form onSubmit={handleAddUser} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Benutzername"
+                value={addUser}
+                onChange={e => setAddUser(e.target.value)}
+                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Initialpasswort"
+                value={addPw}
+                onChange={e => setAddPw(e.target.value)}
+                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none"
+                required
+              />
+              <select
+                value={addRole}
+                onChange={e => setAddRole(e.target.value)}
+                className="w-full px-4 py-2 rounded bg-white/20 text-white focus:outline-none"
+                required
+              >
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
+              </select>
+              <button
+                type="submit"
+                className="bg-party-purple hover:bg-party-purple/80 text-white font-semibold py-2 px-6 rounded shadow"
+              >
+                Hinzufügen
+              </button>
+            </form>
+          </div>
+
+          {/* Nutzer entfernen */}
+          <div>
+            <h2 className="text-2xl font-bold text-party-purple mb-4">Nutzer entfernen</h2>
+            <form onSubmit={handleRemoveUser} className="space-y-4">
+              <select
+                value={removeUser}
+                onChange={e => {
+                  setRemoveUser(e.target.value);
+                  setRemoveConfirm(false); // Reset confirmation if user changes
+                }}
+                className="w-full px-4 py-2 rounded bg-white/20 text-white focus:outline-none"
+                required
+              >
+                <option value="">Benutzer auswählen</option>
+                {userList.map((user) => (
+                  <option key={user} value={user} className="text-party-dark bg-white">{user}</option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                className={`bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded shadow w-full transition ${removeConfirm ? 'ring-2 ring-yellow-400' : ''}`}
+              >
+                {removeConfirm ? 'Löschen bestätigen' : 'Entfernen'}
+              </button>
+              {removeConfirm && (
+                <div className="text-yellow-300 text-center text-sm font-semibold">
+                  Klicke erneut auf "Löschen bestätigen", um den Nutzer unwiderruflich zu entfernen.
+                </div>
+              )}
             </form>
           </div>
         </div>

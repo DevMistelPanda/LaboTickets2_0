@@ -970,6 +970,53 @@ app.get('/api/admin/user-list', authenticateToken, async (req, res) => {
   }
 });
 
+// --- Admin: Nutzer hinzufügen ---
+app.post('/api/admin/add-user', authenticateToken, async (req, res) => {
+  const { username, password, role } = req.body;
+  if (!username || !password || !role) {
+    return res.status(400).json({ message: 'Alle Felder erforderlich' });
+  }
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Nur Admins dürfen Nutzer hinzufügen' });
+  }
+  try {
+    // Prüfe, ob Nutzer schon existiert
+    const [rows] = await pool.execute('SELECT * FROM accounts WHERE username = ?', [username]);
+    if (rows.length > 0) {
+      return res.status(409).json({ message: 'Benutzername existiert bereits' });
+    }
+    const hash = await bcrypt.hash(password, 10);
+    await pool.execute(
+      'INSERT INTO accounts (username, password, role, must_change_password) VALUES (?, ?, ?, 1)',
+      [username, hash, role]
+    );
+    res.json({ message: 'Nutzer erfolgreich hinzugefügt' });
+  } catch (err) {
+    res.status(500).json({ message: 'Fehler beim Hinzufügen des Nutzers' });
+  }
+});
+
+// --- Admin: Nutzer entfernen ---
+app.post('/api/admin/remove-user', authenticateToken, async (req, res) => {
+  const { username } = req.body;
+  if (!username) {
+    return res.status(400).json({ message: 'Benutzername erforderlich' });
+  }
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Nur Admins dürfen Nutzer entfernen' });
+  }
+  try {
+    // Admin darf sich selbst nicht löschen
+    if (username === req.user.username) {
+      return res.status(400).json({ message: 'Du kannst dich nicht selbst löschen.' });
+    }
+    await pool.execute('DELETE FROM accounts WHERE username = ?', [username]);
+    res.json({ message: 'Nutzer erfolgreich entfernt' });
+  } catch (err) {
+    res.status(500).json({ message: 'Fehler beim Entfernen des Nutzers' });
+  }
+});
+
 // 🔹 Static file serving (frontend)
 app.use(express.static(path.join(__dirname, 'dist')));
 
