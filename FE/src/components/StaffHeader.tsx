@@ -64,14 +64,17 @@ const StaffHeader = () => {
           </div>
 
           {/* Mobile menu button */}
-          <button className="md:hidden text-party-dark" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button
+            className={`md:hidden ${isScrolled ? 'text-party-dark' : 'text-white'}`}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden mt-4 pb-4 space-y-2">
+          <nav className="md:hidden mt-4 pb-4 space-y-2 bg-white rounded-xl shadow-lg p-4">
             {navLinks.map((link) => (
               <a
                 key={link.name}
