@@ -25,7 +25,7 @@ const App = () => (
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/login" element={<LoginPage />} />
-
+      <Route path="/admin" element={<AdminPanel />} />
       {/* Staff protected route (any logged-in user) */}
       <Route element={<ProtectedRoute />}>
         <Route path="/staff" element={<StaffPanel />} />
@@ -37,7 +37,7 @@ const App = () => (
 
       {/* Admin only route */}
       <Route element={<RoleProtectedRoute allowedRoles={['admin']} />}>
-        <Route path="/admin" element={<AdminPanel />} />
+        
       </Route>
 
       

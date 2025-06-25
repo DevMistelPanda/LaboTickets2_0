@@ -2,18 +2,11 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/StaffHeader';
 import { toast, Toaster } from 'sonner';
 import StatsDashboard from '@/components/StatsDashboard';
+import UserManagementPanel from '@/components/UserManagementPanel';
 
 const AdminPanel = () => {
   const [username, setUsername] = useState('...');
   const [token, setToken] = useState<string | null>(null);
-  const [resetUser, setResetUser] = useState('');
-  const [resetPw, setResetPw] = useState('');
-  const [userList, setUserList] = useState<string[]>([]);
-  const [addUser, setAddUser] = useState('');
-  const [addPw, setAddPw] = useState('');
-  const [addRole, setAddRole] = useState('staff');
-  const [removeUser, setRemoveUser] = useState('');
-  const [removeConfirm, setRemoveConfirm] = useState(false);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -136,151 +129,6 @@ const AdminPanel = () => {
     }
   };
 
-  // Passwort-Reset Handler
-  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const currentToken = localStorage.getItem('token');
-    if (!currentToken) {
-      toast.error('Nicht eingeloggt.');
-      return;
-    }
-    if (!resetUser || !resetPw) {
-      toast.error('Bitte Benutzername und neues Passwort angeben.');
-      return;
-    }
-    try {
-      const res = await fetch('/api/admin/reset-password', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${currentToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: resetUser, newPassword: resetPw }),
-      });
-      if (res.ok) {
-        toast.success('✅ Passwort erfolgreich zurückgesetzt!');
-        setResetUser('');
-        setResetPw('');
-      } else {
-        let message = 'Unbekannt';
-        try {
-          const data = await res.json();
-          message = data.message || message;
-        } catch {}
-        toast.error(`❌ Fehler: ${message}`);
-      }
-    } catch {
-      // Kein Toast hier, damit es nicht doppelt ist!
-      // toast.error('❌ Fehler beim Zurücksetzen des Passworts.');
-    }
-  };
-
-  // Nutzer hinzufügen Handler
-  const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const currentToken = localStorage.getItem('token');
-    if (!currentToken) {
-      toast.error('Nicht eingeloggt.');
-      return;
-    }
-    if (!addUser || !addPw) {
-      toast.error('Bitte Benutzername und Passwort angeben.');
-      return;
-    }
-    try {
-      const res = await fetch('/api/admin/add-user', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${currentToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: addUser, password: addPw, role: addRole }),
-      });
-      if (res.ok) {
-        toast.success('✅ Nutzer erfolgreich hinzugefügt!');
-        setAddUser('');
-        setAddPw('');
-        setAddRole('staff');
-        // Reload user list
-        const token = localStorage.getItem('token');
-        const res2 = await fetch('/api/admin/user-list', {
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
-        if (res2.ok) {
-          const data = await res2.json();
-          setUserList(data.users || []);
-        }
-      } else {
-        let message = 'Unbekannt';
-        try {
-          const data = await res.json();
-          message = data.message || message;
-        } catch {}
-        toast.error(`❌ Fehler: ${message}`);
-      }
-    } catch {
-      // Kein Toast hier, damit es nicht doppelt ist!
-    }
-  };
-
-  // Nutzer entfernen Handler
-  const handleRemoveUser = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!removeUser) {
-      toast.error('Bitte Benutzer auswählen.');
-      return;
-    }
-    if (!removeConfirm) {
-      setRemoveConfirm(true);
-      toast.warning('Bitte bestätigen Sie das Entfernen durch erneutes Klicken auf "Entfernen".');
-      return;
-    }
-    const currentToken = localStorage.getItem('token');
-    if (!currentToken) {
-      toast.error('Nicht eingeloggt.');
-      setRemoveConfirm(false);
-      return;
-    }
-    try {
-      const res = await fetch('/api/admin/remove-user', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${currentToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: removeUser }),
-      });
-      if (res.ok) {
-        toast.success('✅ Nutzer erfolgreich entfernt!');
-        setRemoveUser('');
-        setRemoveConfirm(false);
-        // Reload user list
-        const token = localStorage.getItem('token');
-        const res2 = await fetch('/api/admin/user-list', {
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
-        if (res2.ok) {
-          const data = await res2.json();
-          setUserList(data.users || []);
-        }
-      } else {
-        let message = 'Unbekannt';
-        try {
-          const data = await res.json();
-          message = data.message || message;
-        } catch {}
-        toast.error(`❌ Fehler: ${message}`);
-        setRemoveConfirm(false);
-      }
-    } catch {
-      setRemoveConfirm(false);
-    }
-  };
-
   return (
     <>
       <Header />
@@ -303,7 +151,8 @@ const AdminPanel = () => {
           <span className="block text-party-purple text-2xl mt-2">Hey {username} 👋</span>
         </div>
 
-        <div className="relative z-10 max-w-4xl w-full space-y-10 backdrop-blur-sm bg-black/30 rounded-lg shadow-xl p-8">
+        {/* News Management Section */}
+        <div className="relative z-10 max-w-4xl w-full space-y-10 backdrop-blur-sm bg-black/30 rounded-lg shadow-xl p-8 mb-12">
           {/* Important News Form */}
           <div>
             <h2 className="text-2xl font-bold text-party-purple mb-4">Wichtige News</h2>
@@ -350,119 +199,13 @@ const AdminPanel = () => {
               </button>
             </form>
           </div>
-
-          {/* Passwort Reset */}
-          <div>
-            <h2 className="text-2xl font-bold text-party-purple mb-4">Passwort zurücksetzen</h2>
-            <form onSubmit={handleResetPassword} className="space-y-4">
-              <select
-                value={resetUser}
-                onChange={e => setResetUser(e.target.value)}
-                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none appearance-none"
-                style={{
-                  backgroundColor: 'rgba(139, 92, 246, 0.15)', // party-purple/20
-                  color: 'white',
-                  border: '1px solid #a78bfa',
-                }}
-                required
-              >
-                <option value="" className="text-party-dark bg-white">Benutzer auswählen</option>
-                {userList.map((user) => (
-                  <option key={user} value={user} className="text-party-dark bg-white">{user}</option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Neues Initialpasswort"
-                value={resetPw}
-                onChange={e => setResetPw(e.target.value)}
-                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none"
-                required
-              />
-              <button
-                type="submit"
-                className="bg-party-purple hover:bg-party-purple/80 text-white font-semibold py-2 px-6 rounded shadow"
-              >
-                Zurücksetzen
-              </button>
-            </form>
-          </div>
-
-          {/* Nutzer hinzufügen */}
-          <div>
-            <h2 className="text-2xl font-bold text-party-purple mb-4">Nutzer hinzufügen</h2>
-            <form onSubmit={handleAddUser} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Benutzername"
-                value={addUser}
-                onChange={e => setAddUser(e.target.value)}
-                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Initialpasswort"
-                value={addPw}
-                onChange={e => setAddPw(e.target.value)}
-                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none"
-                required
-              />
-              <select
-                value={addRole}
-                onChange={e => setAddRole(e.target.value)}
-                className="w-full px-4 py-2 rounded bg-white/20 text-white focus:outline-none"
-                required
-              >
-                <option value="staff">Staff</option>
-                <option value="admin">Admin</option>
-              </select>
-              <button
-                type="submit"
-                className="bg-party-purple hover:bg-party-purple/80 text-white font-semibold py-2 px-6 rounded shadow"
-              >
-                Hinzufügen
-              </button>
-            </form>
-          </div>
-
-          {/* Nutzer entfernen */}
-          <div>
-            <h2 className="text-2xl font-bold text-party-purple mb-4">Nutzer entfernen</h2>
-            <form onSubmit={handleRemoveUser} className="space-y-4">
-              <select
-                value={removeUser}
-                onChange={e => {
-                  setRemoveUser(e.target.value);
-                  setRemoveConfirm(false); // Reset confirmation if user changes
-                }}
-                className="w-full px-4 py-2 rounded bg-white/20 text-white focus:outline-none"
-                required
-              >
-                <option value="">Benutzer auswählen</option>
-                {userList.map((user) => (
-                  <option key={user} value={user} className="text-party-dark bg-white">{user}</option>
-                ))}
-              </select>
-              <button
-                type="submit"
-                className={`bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded shadow w-full transition ${removeConfirm ? 'ring-2 ring-yellow-400' : ''}`}
-              >
-                {removeConfirm ? 'Löschen bestätigen' : 'Entfernen'}
-              </button>
-              {removeConfirm && (
-                <div className="text-yellow-300 text-center text-sm font-semibold">
-                  Klicke erneut auf "Löschen bestätigen", um den Nutzer unwiderruflich zu entfernen.
-                </div>
-              )}
-            </form>
-          </div>
         </div>
       </section>
       {/* Add StatsDashboard below the forms */}
-        <div className="relative z-10 w-full">
-          <StatsDashboard />
-        </div>
+      <div className="relative z-10 w-full">
+        <UserManagementPanel />
+        <StatsDashboard />
+      </div>
     </>
   );
 };
