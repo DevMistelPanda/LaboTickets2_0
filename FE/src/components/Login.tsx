@@ -33,7 +33,12 @@ const Login = () => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', username)
       localStorage.setItem('role', data.role);
-      navigate('/staff');
+      // Prüfe must_change_password
+      if (data.must_change_password) {
+        navigate('/change-password', { replace: true });
+      } else {
+        navigate('/staff', { replace: true });
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {

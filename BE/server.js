@@ -35,7 +35,7 @@ function sha256(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-// Middleware: verify JWT token
+// --- Middleware: verify JWT token ---
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -43,7 +43,11 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: 'Ungültiger Token' });
-    req.user = user; // user contains { id, username, role, iat, exp }
+    // Fallback: id als Zahl parsen, falls vorhanden
+    if (user && typeof user.id !== 'undefined' && user.id !== null) {
+      user.id = Number(user.id);
+    }
+    req.user = user; // user contains { id, username, role, ... }
     next();
   });
 }
@@ -237,19 +241,26 @@ app.post('/api/login', async (req, res) => {
 
     const user = rows[0];
     const storedHash = user.password;
-    // Use bcrypt to compare password
     const isMatch = await bcrypt.compare(password, storedHash);
     if (!isMatch) {
       return res.status(401).json({ message: 'Ungültiger Benutzer oder Passwort' });
     }
 
+    // Stelle sicher, dass user.id wirklich gesetzt ist und eine Zahl ist
+    const userId = typeof user.id !== 'undefined' && user.id !== null ? Number(user.id) : null;
+
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { id: userId, username: user.username, role: user.role, must_change_password: !!user.must_change_password },
       SECRET,
       { expiresIn: '2h' }
     );
 
-    res.json({ token, username: user.username, role: user.role });
+    res.json({ 
+      token, 
+      username: user.username, 
+      role: user.role, 
+      must_change_password: !!user.must_change_password 
+    });
   } catch (err) {
     console.error('❌ Login error:', err);
     res.status(500).json({ message: 'Serverfehler' });
@@ -884,6 +895,78 @@ app.post('/api/scanner', async (req, res) => {
       html: '<div class="text-red-600 font-bold">Serverfehler beim Prüfen des Tickets.</div>',
       color: 'red'
     });
+  }
+});
+
+// --- Reset password (Admin only) ---
+app.post('/api/admin/reset-password', authenticateToken, async (req, res) => {
+  const { username, newPassword } = req.body;
+  if (!username || !newPassword) {
+    return res.status(400).json({ message: 'Benutzername und neues Passwort erforderlich' });
+  }
+  try {
+    // Prüfe ob User Admin ist
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Nur Admins dürfen Passwörter zurücksetzen' });
+    }
+    const hash = await bcrypt.hash(newPassword, 10);
+    await pool.execute(
+      'UPDATE accounts SET password = ?, must_change_password = 1 WHERE username = ?',
+      [hash, username]
+    );
+    res.json({ message: 'Passwort erfolgreich zurückgesetzt' });
+  } catch (err) {
+    console.error('Fehler beim Passwort-Reset:', err);
+    res.status(500).json({ message: 'Serverfehler beim Passwort-Reset' });
+  }
+});
+
+// --- Change password (User) ---
+// Statt ID wird der Username aus dem Token verwendet
+app.post('/api/user/change-password', authenticateToken, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    return res.status(400).json({ message: 'Altes und neues Passwort erforderlich' });
+  }
+  if (!req.user || !req.user.username) {
+    return res.status(400).json({ message: 'Benutzername fehlt im Token' });
+  }
+  try {
+    const [rows] = await pool.execute(
+      'SELECT * FROM accounts WHERE username = ?',
+      [req.user.username]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+    const user = rows[0];
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Altes Passwort ist falsch' });
+    }
+    const hash = await bcrypt.hash(newPassword, 10);
+    await pool.execute(
+      'UPDATE accounts SET password = ?, must_change_password = 0 WHERE username = ?',
+      [hash, req.user.username]
+    );
+    res.json({ message: 'Passwort erfolgreich geändert' });
+  } catch (err) {
+    console.error('Fehler beim Passwort ändern:', err);
+    res.status(500).json({ message: 'Serverfehler beim Passwort ändern' });
+  }
+});
+
+// --- Admin: User-Liste für Dropdown ---
+app.get('/api/admin/user-list', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Nur Admins dürfen Benutzer abrufen' });
+    }
+    const [rows] = await pool.query('SELECT username FROM accounts');
+    const users = rows.map(r => r.username);
+    res.json({ users });
+  } catch (err) {
+    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerliste' });
   }
 });
 

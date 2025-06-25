@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/StaffHeader';
 import { toast, Toaster } from 'sonner';
 import StatsDashboard from '@/components/StatsDashboard';
@@ -6,6 +6,9 @@ import StatsDashboard from '@/components/StatsDashboard';
 const AdminPanel = () => {
   const [username, setUsername] = useState('...');
   const [token, setToken] = useState<string | null>(null);
+  const [resetUser, setResetUser] = useState('');
+  const [resetPw, setResetPw] = useState('');
+  const [userList, setUserList] = useState<string[]>([]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -13,6 +16,27 @@ const AdminPanel = () => {
 
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
+  }, []);
+
+  // Lade alle Usernamen für das Dropdown
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/admin/user-list', {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUserList(data.users || []);
+        }
+      } catch {
+        // ignore
+      }
+    };
+    fetchUsers();
   }, []);
 
   const handleImportantSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -107,6 +131,45 @@ const AdminPanel = () => {
     }
   };
 
+  // Passwort-Reset Handler
+  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const currentToken = localStorage.getItem('token');
+    if (!currentToken) {
+      toast.error('Nicht eingeloggt.');
+      return;
+    }
+    if (!resetUser || !resetPw) {
+      toast.error('Bitte Benutzername und neues Passwort angeben.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/reset-password', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: resetUser, newPassword: resetPw }),
+      });
+      if (res.ok) {
+        toast.success('✅ Passwort erfolgreich zurückgesetzt!');
+        setResetUser('');
+        setResetPw('');
+      } else {
+        let message = 'Unbekannt';
+        try {
+          const data = await res.json();
+          message = data.message || message;
+        } catch {}
+        toast.error(`❌ Fehler: ${message}`);
+      }
+    } catch {
+      // Kein Toast hier, damit es nicht doppelt ist!
+      // toast.error('❌ Fehler beim Zurücksetzen des Passworts.');
+    }
+  };
+
   return (
     <>
       <Header />
@@ -173,6 +236,43 @@ const AdminPanel = () => {
                 className="bg-party-purple hover:bg-party-purple/80 text-white font-semibold py-2 px-6 rounded shadow"
               >
                 Absenden
+              </button>
+            </form>
+          </div>
+
+          {/* Passwort Reset */}
+          <div>
+            <h2 className="text-2xl font-bold text-party-purple mb-4">Passwort zurücksetzen</h2>
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <select
+                value={resetUser}
+                onChange={e => setResetUser(e.target.value)}
+                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none appearance-none"
+                style={{
+                  backgroundColor: 'rgba(139, 92, 246, 0.15)', // party-purple/20
+                  color: 'white',
+                  border: '1px solid #a78bfa',
+                }}
+                required
+              >
+                <option value="" className="text-party-dark bg-white">Benutzer auswählen</option>
+                {userList.map((user) => (
+                  <option key={user} value={user} className="text-party-dark bg-white">{user}</option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="Neues Initialpasswort"
+                value={resetPw}
+                onChange={e => setResetPw(e.target.value)}
+                className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-party-purple hover:bg-party-purple/80 text-white font-semibold py-2 px-6 rounded shadow"
+              >
+                Zurücksetzen
               </button>
             </form>
           </div>

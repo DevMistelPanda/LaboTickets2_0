@@ -19,11 +19,15 @@ const LoginPage = () => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const decoded = jwtDecode<JwtPayload>(token);
+        const decoded = jwtDecode<JwtPayload & { must_change_password?: boolean }>(token);
 
         if (decoded.exp * 1000 > Date.now()) {
-          toast.success('Du bist bereits eingeloggt.');
-          navigate('/staff', { replace: true });
+          if (decoded.must_change_password) {
+            navigate('/change-password', { replace: true });
+          } else {
+            toast.success('Du bist bereits eingeloggt.');
+            navigate('/staff', { replace: true });
+          }
         } else {
           // Token expired, remove it
           localStorage.removeItem('token');

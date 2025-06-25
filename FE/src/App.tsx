@@ -12,6 +12,7 @@ import StaffPanel from "./pages/StaffPanel";
 import AdminPanel from "./pages/AdminPanel"
 import Purchase from "./pages/purcase";
 import Scanner from "./pages/Scanner";
+import ChangePassword from './pages/ChangePassword';
 
 const queryClient = new QueryClient();
 
@@ -30,12 +31,16 @@ const App = () => (
         <Route path="/staff" element={<StaffPanel />} />
         <Route path="/ausgabe" element={<Purchase />} />
         <Route path="/scanning" element={<Scanner />} />
+        <Route path="/change-password" element={<ChangePassword />} />
+        
       </Route>
 
       {/* Admin only route */}
       <Route element={<RoleProtectedRoute allowedRoles={['admin']} />}>
         <Route path="/admin" element={<AdminPanel />} />
       </Route>
+
+      
 
       {/* Catch all */}
       <Route path="*" element={<NotFound />} />
