@@ -28,7 +28,7 @@ const DetailsSection = () => {
     {
       icon: <Euro size={28} className="text-party-purple" />,
       title: "Eintritt",
-      info: "Der Eintritt wird noch bekannt gegeben"
+      info: "Den Eintrittspreis könnt ihr aus den Elternbriefen & Durchsagen entnehmen."
     },
     {
       icon: <Ticket size={28} className="text-party-purple" />,
