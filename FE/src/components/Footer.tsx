@@ -1,4 +1,3 @@
-
 import { Mail } from 'lucide-react';
 
 const Footer = () => {
@@ -37,7 +36,7 @@ const Footer = () => {
             <div className="mt-6">
               <div className="flex items-center space-x-2">
                 <Mail size={18} className="text-party-purple" />
-                <span>milan@wintruff.de</span>
+                <span>info@winaudio.de</span>
               </div>
             </div>
           </div>
@@ -66,10 +65,23 @@ const Footer = () => {
         
         <div className="pt-8 mt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-center md:text-left">
-            © {currentYear} Milan Wintruff
+            © {currentYear}{" "}
+            <a
+              href="https://winaudio.de"
+              className="underline hover:text-party-purple transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WinAudio
+            </a>
           </p>
           <div className="mt-4 md:mt-0 flex space-x-6">
-            <a href="https://sb.wintruff.de/impressum" className="text-gray-400 hover:text-party-purple">
+            <a
+              href="https://winaudio.de/impressum"
+              className="text-gray-400 hover:text-party-purple"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Impressum & Datenschutz
             </a>
           </div>
