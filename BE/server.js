@@ -848,15 +848,15 @@ app.post('/api/scanner', async (req, res) => {
     // Determine color by class (simple mapping, adjust as needed)
     let color = 'gray';
     const classMap = {
-      '5': 'green',
-      '6': 'green',
-      '7': 'green',
+      '5': 'red',
+      '6': 'red',
+      '7': 'red',
       '8': 'green',
-      '9': 'red',
-      '10': 'red',
-      '11': 'red',
-      '12': 'red',
-      '13': 'red'
+      '9': 'green',
+      '10': 'green',
+      '11': 'green',
+      '12': 'green',
+      '13': 'green'
     };
     // Extract number from class string
     const classNumber = (visitor.class || '').replace(/[^0-9]/g, '');
