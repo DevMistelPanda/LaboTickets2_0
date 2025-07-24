@@ -126,7 +126,7 @@ const StaffPanel = () => {
           {backendError && (
             console.log('503: Backend error occurred'),
             <div className="bg-red-600/80 text-white text-center px-4 py-3 rounded-md font-medium shadow">
-              ❌ (503) Backend nicht erreichbar – bitte kontaktiere den Admin.
+              ❌ (503) Backend nicht erreichbar – bitte überprüfe deine Verbindung oder kontaktiere den Admin.
             </div>
           )}
 
