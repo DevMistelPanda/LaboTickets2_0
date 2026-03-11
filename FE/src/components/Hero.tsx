@@ -4,12 +4,12 @@ import CountdownTimer from '@/components/CountdownTimer';
 const Hero = () => {
   return (
     <section className="relative h-screen flex items-center overflow-hidden">
-      {/* Background with gradient overlay */}
+      {/* Background with animated rainbow overlay */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-party-dark/80 to-party-purple/50 z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600 opacity-40 animate-rainbow z-10"></div>
         <div 
           className="w-full h-full bg-cover bg-center"
-          style={{ backgroundImage: "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')" }}
+          style={{ backgroundImage: "url('')" }}
         ></div>
       </div>
 

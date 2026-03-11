@@ -19,6 +19,7 @@ export default {
 			}
 		},
 		extend: {
+
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -64,12 +65,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				party: {
-					'purple': '#9b87f5',
-					'light-purple': '#E5DEFF',
-					'blue': '#1EAEDB',
-					'light-blue': '#D3E4FD',
-					'dark': '#1A1F2C',
-					'gray': '#8E9196'
+					'purple': 'rgb(0, 204, 255)',
+					'light-purple': 'rgb(131, 225, 253)',
+					'blue': 'rgb(0, 0, 255)',
+					'light-blue': 'rgb(110, 109, 221)',
+					'dark': 'rgb(0, 0, 0)',
+					'gray': 'rgb(124, 124, 124)'
 				}
 			},
 			borderRadius: {
@@ -119,11 +120,14 @@ export default {
 				'fade-in': 'fade-in 0.5s ease-out',
 				'bounce': 'bounce 2s ease-in-out infinite'
 			},
+
 			fontFamily: {
 				'sans': ['Inter', 'ui-sans-serif', 'system-ui'],
 				'display': ['Montserrat', 'ui-sans-serif', 'system-ui']
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate")
+	],
 } satisfies Config;
