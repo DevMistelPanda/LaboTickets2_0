@@ -11,42 +11,35 @@ const ScheduleSection = () => {
       description: "Einlass beginnt, die ersten Gäste treffen ein. Unser Team begrüßt euch herzlich."
     },
     {
-      time: "16:30 Uhr",
-      title: "Begrüßung der ersten Gäste",
-      description: "Kurze Ansprache durch die Organisatoren und kurze Vorstellung des Programms."
-    },
-    {
-      time: "20:00 Uhr",
-      title: "Ende für 5. - 8. Klassen",
-      description: "Aus rechtlichen Gründen müssen die jüngeren Schüler um 20:00 Uhr den Ball verlassen."
-    },
-    {
-      time: "22:00 Uhr",
-      title: "Ende Des Balls",
-      description: "Der Ball endet offiziell."
-    },
-    {
-      time: "ab 22:00 Uhr",
-      title: "Gemeinsames Aufräumen",
-      description: "Alle Helfer und Organisatoren packen mit an, um den Veranstaltungsort sauber zu hinterlassen. Wir freuen uns über jede helfende Hand!"
+      time: "TBA",
+      title: "In Planung...",
+      description: "Unsere Planungen für den Abend sind noch nicht ganz abgeschlossen, aber seid gespannt auf tolle Überraschungen!"
     }
   ];
   
-  const performers = [
+  const highlights = [
     {
       name: "AK Licht & Ton",
       role: "DJ",
       image: "https://images.pexels.com/photos/63703/pexels-photo-63703.jpeg",
       description: "Unser AK Licht & Ton wird den Abend mit einem DJ begleiten, der für die richtige Stimmung sorgt."
     },
+        {
+      name: "Überraschung",
+      role: "In Planung",
+      image: "https://st3.depositphotos.com/2777531/12741/v/450/depositphotos_127410624-stock-illustration-surprise-inscription-with-sunrays.jpg",
+      description: "Wir haben noch ein paar Überraschungen für euch geplant, die wir hier aber noch nicht verraten wollen. Seid gespannt!"
+      
+    },
     {
-      name: "Schulball Playlist 2024",
+      name: "Schulball Playlist 2025",
       role: <a href="https://open.spotify.com/playlist/5gLhpUbpP8fuMhHPQCI4XI?si=583efdb5e17942b2"> Klicke hier</a>,
       image: "https://developer.spotify.com/images/guidelines/design/using-our-logo.svg",
       description: <a href="https://open.spotify.com/playlist/5gLhpUbpP8fuMhHPQCI4XI?si=583efdb5e17942b2" className="text-gray-400 hover:text-party-purple">
-      Bekommt mit der Schulball Playlist 2024 einen Vorgeschmack auf die Musik, die euch erwartet!
+      Bekommt mit der Schulball Playlist 2025 einen Vorgeschmack auf die Musik, die euch erwartet!
       </a>
     }
+
   ];
 
   return (
@@ -56,7 +49,7 @@ const ScheduleSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Party Programm</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            Wir haben den Ball wie immer im Detail geplant, um euch ein tolles Erlebnis zu bieten. Hier ist unser Programm für den Abend:
+           Auch wenn wir noch mitten in der Planung stecken, können wir euch schon jetzt versprechen, dass es ein unvergesslicher Abend wird! Hier bekommt ihr einen kleinen Vorgeschmack auf das, was euch erwartet.
           </p>
         </div>
 
@@ -66,13 +59,13 @@ const ScheduleSection = () => {
               className={`rounded-full px-6 ${activeTab === 'schedule' ? 'bg-party-purple text-white' : 'bg-transparent text-party-dark hover:bg-gray-100'}`}
               onClick={() => setActiveTab('schedule')}
             >
-              Programm
+              Ablauf
             </Button>
             <Button
-              className={`rounded-full px-6 ${activeTab === 'performers' ? 'bg-party-purple text-white' : 'bg-transparent text-party-dark hover:bg-gray-100'}`}
-              onClick={() => setActiveTab('performers')}
+              className={`rounded-full px-6 ${activeTab === 'hightlights' ? 'bg-party-purple text-white' : 'bg-transparent text-party-dark hover:bg-gray-100'}`}
+              onClick={() => setActiveTab('hightlights')}
             >
-              Unsere Musik
+              Hightlights
             </Button>
           </div>
         </div>
@@ -118,17 +111,17 @@ const ScheduleSection = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
-            {performers.map((performer, index) => (
+            {highlights.map((highlight, index) => (
               <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden">
                 <img 
-                  src={performer.image} 
-                  alt={performer.name} 
+                  src={highlight.image} 
+                  alt={highlight.name} 
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-6">
-                  <div className="text-sm font-medium text-party-purple mb-1">{performer.role}</div>
-                  <h3 className="text-xl font-bold text-party-dark mb-2">{performer.name}</h3>
-                  <p className="text-party-gray">{performer.description}</p>
+                  <div className="text-sm font-medium text-party-purple mb-1">{highlight.role}</div>
+                  <h3 className="text-xl font-bold text-party-dark mb-2">{highlight.name}</h3>
+                  <p className="text-party-gray">{highlight.description}</p>
                 </div>
               </div>
             ))}
