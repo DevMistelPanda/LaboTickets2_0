@@ -7,14 +7,14 @@ const Footer = () => {
     {
       title: "Quick Links",
       links: [
-        { name: "About", href: "#about" },
-        { name: "Details", href: "#details" },
-        { name: "Schedule", href: "#schedule" },
+        { name: "Infos", href: "#about" },
+        { name: "Event Details", href: "#details" },
+        { name: "Programm & Highlights", href: "#schedule" },
         { name: "FAQ", href: "#faq" },
       ]
     },
     {
-      title: "Folgt unserer Schule",
+      title: "Mehr zu unserer Schule",
       links: [
         { name: "Instagram", href: "https://www.instagram.com/_labenwolf/" },
         { name: "Webseite", href: "https://www.labenwolf.de" },
@@ -28,7 +28,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           <div>
             <a href="#" className="text-white font-display font-bold text-2xl">
-              Labo Ball<span className="text-party-purple">25</span>
+              Labo Ball<span className="text-party-purple">26</span>
             </a>
             <p className="mt-4 text-gray-400 max-w-xs">
               Seit dabei und feiere mit uns ein weiteres Jahr Labenwolf!
@@ -66,7 +66,7 @@ const Footer = () => {
         <div className="pt-8 mt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-center md:text-left">
             © {currentYear}{" "}
-            <a
+             Labenwolf Gymnasium & <a
               href="https://winaudio.de"
               className="underline hover:text-party-purple transition-colors"
               target="_blank"
