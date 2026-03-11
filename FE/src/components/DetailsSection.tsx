@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { MapPin, Calendar, Clock, Users, Euro, Ticket } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Ticket } from 'lucide-react';
 
 const DetailsSection = () => {
   const pinterestRef = useRef<HTMLDivElement>(null);
@@ -8,12 +8,12 @@ const DetailsSection = () => {
     {
       icon: <Calendar size={28} className="text-party-purple" />,
       title: "Datum",
-      info: "Freitag, Juli 25, 2025"
+      info: "Freitag, Juli 10, 2026"
     },
     {
       icon: <Clock size={28} className="text-party-purple" />,
       title: "Zeiten",
-      info: "16:00 Uhr - 22:00 Uhr"
+      info: "Ab 16:00"
     },
     {
       icon: <MapPin size={28} className="text-party-purple" />,
@@ -23,16 +23,16 @@ const DetailsSection = () => {
     {
       icon: <Users size={28} className="text-party-purple" />,
       title: "Dress Code",
-      info: "Masken im venezianischen Stil"
+      info: "Lasst eurer Kreativität freien Lauf, aber denkt daran: Angemessen ist ein Muss!"
     },
     {
-      icon: <Euro size={28} className="text-party-purple" />,
-      title: "Eintritt",
-      info: "Den Eintrittspreis könnt ihr aus den Elternbriefen & Durchsagen entnehmen."
+      icon: <span className="text-party-purple text-2xl">🥨</span>,
+      title: "Snacks & Getränke",
+      info: "Auch dieses Jahr gibt es wieder eine Auswahl an Getränken und Brezeln"
     },
     {
       icon: <Ticket size={28} className="text-party-purple" />,
-      title: "Tickets",
+      title: "Tickets & Preise",
       info: "Tickets könnt ihr nach den Pfingstferien in den Pausen erwerben, oder an der Abendkasse kaufen."
     }
   ];
@@ -62,13 +62,9 @@ const DetailsSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Event Details</h2>
           <div className="w-24 h-1 bg-party-purple mx-auto mb-8"></div>
           <p className="max-w-3xl mx-auto text-lg text-party-dark/80">
-            Alles, was es zu wissen gibt zum Schulball 2025. <br />
-            Außerdem ein paar inspirierende Bilder von venezianischen Masken.
+            Alles, was es zu wissen gibt zum Schulball 2025.
           </p>
         </div>
-
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          {/* Event Info */}
           <div className="bg-white p-8 rounded-xl shadow-md">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {details.map((item, index) => (
@@ -84,17 +80,7 @@ const DetailsSection = () => {
               ))}
             </div>
           </div>
-
-          {/* Image replacing Pinterest Embed */}
-          <div className="rounded-xl overflow-hidden shadow-md h-[450px] flex items-center justify-center bg-white">
-            <img
-              src="/images/Inspo2025.png"
-              alt="Venezianische Masken Inspiration 2025"
-              className="object-cover w-full h-full"
-            />
-          </div>
         </div>
-      </div>
     </section>
   );
 };
