@@ -16,7 +16,7 @@ const Hero = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
         <div className="max-w-3xl animate-fade-in">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-            Schulball 2025
+            Schul Ball 2026
             <span className="block text-party-purple text-shadow">Ein weiteres Jahr Labenwolf</span>
           </h1>
           
