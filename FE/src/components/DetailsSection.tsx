@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { MapPin, Calendar, Clock, Users, Ticket } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Ticket, Sandwich } from 'lucide-react';
 
 const DetailsSection = () => {
   const pinterestRef = useRef<HTMLDivElement>(null);
@@ -26,7 +26,7 @@ const DetailsSection = () => {
       info: "Lasst eurer Kreativität freien Lauf, aber denkt daran: Angemessen ist ein Muss!"
     },
     {
-      icon: <span className="text-party-purple text-2xl">🥨</span>,
+      icon: <Sandwich size={28} className="text-party-purple" />,
       title: "Snacks & Getränke",
       info: "Auch dieses Jahr gibt es wieder eine Auswahl an Getränken und Brezeln"
     },
