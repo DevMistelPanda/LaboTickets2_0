@@ -136,15 +136,12 @@ const AdminPanel = () => {
       <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden text-white px-4">
         {/* Background */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-party-dark/80 to-party-purple/50 z-10"></div>
-          <div
-            className="w-full h-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')",
-            }}
-          />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600 opacity-40 animate-rainbow z-10"></div>
+        <div 
+          className="w-full h-full bg-cover bg-center"
+          style={{ backgroundImage: "url('')" }}
+        ></div>
+      </div>
 
         <div className="relative z-10 text-center mb-6 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">Admin Panel</h1>
