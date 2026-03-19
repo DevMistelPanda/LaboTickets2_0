@@ -204,15 +204,13 @@ export default function PurchaseForm() {
 
       <div className="relative w-full h-screen">
         {/* Hintergrundbild */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')",
-            filter: "brightness(0.6)",
-            zIndex: 0,
-          }}
-        />
+        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600 opacity-40 animate-rainbow z-10"></div>
+        <div 
+          className="w-full h-full bg-cover bg-center"
+          style={{ backgroundImage: "url('')" }}
+        ></div>
+      </div>
 
         <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
           <form
