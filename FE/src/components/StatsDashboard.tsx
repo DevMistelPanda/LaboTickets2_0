@@ -24,6 +24,8 @@ ChartJS.register(
 );
 
 const StatsDashboard = () => {
+  const partyPurple = 'rgb(0, 204, 255)'; // Party purple color from Tailwind config
+
   const [salesOverTime, setSalesOverTime] = useState<{ date: string; sold: number }[]>([]);
   const [salesPerClass, setSalesPerClass] = useState<{ class_number: string; sold: number }[]>([]);
   const [enteredOverTime, setEnteredOverTime] = useState<{ hour: string; entered: number }[]>([]);
@@ -69,8 +71,8 @@ const StatsDashboard = () => {
                     label: 'Tickets verkauft',
                     data: salesOverTime.map(d => d.sold),
                     fill: false,
-                    borderColor: '#7c3aed',
-                    backgroundColor: '#a78bfa',
+                    borderColor: partyPurple,
+                    backgroundColor: partyPurple,
                     tension: 0.2,
                 },
                 ],
@@ -93,7 +95,7 @@ const StatsDashboard = () => {
                 {
                     label: 'Tickets verkauft',
                     data: salesPerClass.map(d => d.sold),
-                    backgroundColor: '#7c3aed',
+                    backgroundColor: partyPurple,
                 },
                 ],
             }}
@@ -119,7 +121,7 @@ const StatsDashboard = () => {
               {
                 label: 'Eintritte',
                 data: enteredOverTime.map(d => d.entered),
-                backgroundColor: '#7c3aed',
+                backgroundColor: partyPurple,
               },
             ],
           }}
@@ -146,7 +148,7 @@ const StatsDashboard = () => {
                 label: 'Tickets verkauft',
                 data: salesPerUser.map(d => d.sold),
                 backgroundColor: salesPerUser.map((_, idx) =>
-                  idx === 0 ? '#f59e42' : '#6366f1' // Highlight top seller
+                  idx === 0 ? '#f59e42' : partyPurple // Highlight top seller
                 ),
               },
             ],
