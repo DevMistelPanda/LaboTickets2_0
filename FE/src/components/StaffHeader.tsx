@@ -37,7 +37,7 @@ const StaffHeader = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <a href="#" className={`${isScrolled ? 'text-party-dark' : 'text-white'} font-display font-bold text-xl md:text-2xl}`}>
-              Schul Ball<span className="text-party-purple">25</span>
+              Schul Ball<span className="text-party-purple">26</span>
             </a>
           </div>
 
