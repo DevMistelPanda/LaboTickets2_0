@@ -4,26 +4,26 @@ import CountdownTimer from '@/components/CountdownTimer';
 const Hero = () => {
   return (
     <section className="relative h-screen flex items-center overflow-hidden">
-      {/* Background with gradient overlay */}
+      {/* Background with animated rainbow overlay */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-party-dark/80 to-party-purple/50 z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600 opacity-40 animate-rainbow z-10"></div>
         <div 
           className="w-full h-full bg-cover bg-center"
-          style={{ backgroundImage: "url('https://media.istockphoto.com/id/170085684/de/foto/hers-und-seine-masken-auf-schwarzem-hintergrund.jpg?s=612x612&w=0&k=20&c=qgktvJ3waDrNskuj2bwIamOQEpN0H0kDXQnQ5_-vJYs=')" }}
+          style={{ backgroundImage: "url('')" }}
         ></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
         <div className="max-w-3xl animate-fade-in">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-            Schulball 2025
+            Schul Ball 2026
             <span className="block text-party-purple text-shadow">Ein weiteres Jahr Labenwolf</span>
           </h1>
           
           {/* Countdown Timer using the component */}
           <div className="mb-8 bg-black/30 backdrop-blur-sm rounded-lg p-4">
             <p className="text-sm font-medium mb-2">Zeit bis zum Ball:</p>
-            <CountdownTimer targetDate="2025-07-25T16:00:00" />
+            <CountdownTimer targetDate="2026-07-10T16:00:00" />
           </div>
 
           <p className="text-xl md:text-2xl mb-8 opacity-90">
@@ -33,11 +33,11 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
             <div className="flex items-center">
               <Calendar className="mr-2 text-party-purple" size={24} />
-              <span className="text-lg">25. Juli 2025</span>
+              <span className="text-lg">10. Juli 2026</span>
             </div>
             <div className="flex items-center">
               <Clock className="mr-2 text-party-purple" size={24} />
-              <span className="text-lg">16:00 Uhr - 22:00 Uhr</span>
+              <span className="text-lg">Ab 16:00 Uhr</span>
             </div>
           </div>
         </div>

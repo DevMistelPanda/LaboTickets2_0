@@ -11,15 +11,15 @@ const FaqSection = () => {
   const faqs = [
     {
       question: "Was ist der Dresscode für den Ball?",
-      answer: "Der Dresscode ist: Maske im venezianischen Stil. Wir empfehlen dir auch elegante Kleidung. Für Inspirationen frag gerne unseren AK."
+      answer: "Dieses Jahr wird es keinen festen Dresscode geben, damit ihr euch frei entfalten könnt. Wir bitten euch jedoch, angemessene Kleidung zu tragen, die zum festlichen Anlass passt. Kreativität ist ausdrücklich erwünscht!"
     },
     {
       question: "Wo bekomme ich Tickets?",
-      answer: "Die Tickets sind nach den Pfingstferien in den Pausen erhältlich."
+      answer: "Die Tickets sind nach den Pfingstferien in den Pausen erhältlich. Mehr Informaationen zum Ticketverkauf findet ihr auf unserer Website und in den Ankündigungen in der Schule. Es wird auch eine begrenzte Anzahl von Tickets an der Abendkasse geben, aber wir empfehlen, eure Tickets im Voraus zu sichern, um Enttäuschungen zu vermeiden."
     },
     {
       question: "Dürfen Leute außerhalb der Schule teilnehmen?",
-      answer: "Nein. Der Schulball 2025 ist eine exklusive Veranstaltung für Schüler des Labenwolf Gymnasiums. Gäste von anderen Schulen sind leider nicht erlaubt."
+      answer: "Nein. Der Schulball 2026 ist, wie auch die letzten Jahre, eine exklusive Veranstaltung für Schülis des Labenwolf Gymnasiums. Gäste von anderen Schulen sind leider nicht erlaubt."
     },
     {
       question: "Wird es was zu essen und trinken geben?",
@@ -27,7 +27,7 @@ const FaqSection = () => {
     },
     {
       question: "Wann endet der Ball?",
-      answer: "Der Ball endet für die 5. - 8. Klassen um 20:00 Uhr. Für die 9. - 12. Klassen endet der Ball um 22:00 Uhr. Bitte plant eure Anreise und Abreise entsprechend."
+      answer: "Das genaue Ende des Balls wird noch bekannt gegeben, aber wir planen, dass die Veranstaltung bis 21:00 Uhr dauert."
     },
     {
       question: "Gibt es einen Wieder-Einlass?",
@@ -35,7 +35,7 @@ const FaqSection = () => {
     },
     {
       question: "Welche Gegenstände / Substanzen sind verboten?",
-      answer: "Verboten sind: Alkohol, Drogen, Waffen, Feuerwerkskörper und andere gefährliche Gegenstände. Bitte respektiert diese Regeln, um die Sicherheit aller Teilnehmenden zu gewährleisten."
+      answer: "Verboten sind: Alkohol, Drogen, Waffen, Feuerwerkskörper und andere gefährliche Gegenstände. Bitte respektiert diese Regeln, um die Sicherheit aller Gäste und Mitarbeiter zu gewährleisten."
     },
     {
       question: "Wird es eine Taschenkontrolle geben?",

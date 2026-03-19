@@ -33,7 +33,7 @@ const CountdownTimer = ({ targetDate }: { targetDate: string }) => {
   if (hasEnded) {
     return (
       <div className="text-center text-2xl sm:text-3xl font-bold text-purple-400">
-        🎉 Der Schulball 2025 ist gestartet 🎉
+        🎉 Der Schulball 2026 ist voll im Gang! 🎉
       </div>
     );
   }

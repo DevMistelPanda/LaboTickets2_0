@@ -9,12 +9,12 @@ const AboutSection = () => {
     },
     {
       icon: <Music size={40} className="text-party-purple mb-4" />,
-      title: "Gute Musik und eure Wünsche",
+      title: "Eure Musik und unsere DJs",
       description: "Genießt die besten Hits und bringt eure Musikwünsche mit, um die Tanzfläche zum Beben zu bringen!"
     },
     {
       icon: <Users size={40} className="text-party-purple mb-4" />,
-      title: "Feiert gemeinsam mit Freunden",
+      title: "Schulgemeinschaft feiern",
       description: "Treffe alte Freunde und knüpfe neue Bekanntschaften bei der besten Schulparty des Jahres!"
     }
   ];
